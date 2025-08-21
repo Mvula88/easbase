@@ -1,0 +1,19 @@
+{
+  "name": "easbase",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run build:packages && npm run dev:web",
+    "dev:web": "npm run dev --workspace=@easbase/web",
+    "build:packages": "npm run build --workspace=@easbase/core && npm run build --workspace=@easbase/sdk",
+    "build": "npm run build:packages && npm run build --workspace=@easbase/web"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "AI-powered backend infrastructure for modern applications"
+}
