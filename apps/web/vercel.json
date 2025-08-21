@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "installCommand": "npm install",
-  "buildCommand": "npm run build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "echo 'Building Next.js app' && npm run build",
   "outputDirectory": ".next"
 }
