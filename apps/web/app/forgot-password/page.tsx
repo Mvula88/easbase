@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
-import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, ArrowLeft, CheckCircle, AlertCircle, Zap } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
