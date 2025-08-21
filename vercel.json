@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm run build:all",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "root": ".",
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet ."
+}

@@ -1,29 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CacheManager } from '@easbase/core';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
-
-async function verifyApiKey(apiKey: string | null) {
-  if (!apiKey) return null;
-  
-  const { data: customer } = await supabase
-    .from('customers')
-    .select('*')
-    .eq('api_key', apiKey)
-    .single();
-  
-  return customer;
-}
+import { createServiceClient } from '@/lib/auth/supabase';
 
 export async function POST(req: NextRequest) {
   try {
     // Verify API key
     const apiKey = req.headers.get('x-api-key');
-    const customer = await verifyApiKey(apiKey);
+    
+    if (!apiKey) {
+      return NextResponse.json({ error: 'API key required' }, { status: 401 });
+    }
+    
+    const supabase = await createServiceClient();
+    
+    // Verify customer
+    const { data: customer } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('api_key', apiKey)
+      .single();
     
     if (!customer) {
       return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
@@ -35,16 +29,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
     
-    const cacheManager = new CacheManager();
-    const result = await cacheManager.findSimilar(prompt, 0.90); // 90% similarity threshold
+    // Search for similar schemas in cache
+    const promptHash = Buffer.from(prompt).toString('base64').slice(0, 32);
     
-    if (result) {
+    const { data: cached } = await supabase
+      .from('schema_cache')
+      .select('*')
+      .eq('prompt_hash', promptHash)
+      .single();
+    
+    if (cached) {
       return NextResponse.json({
         found: true,
-        schema: result.response_schema,
-        sql: result.response_sql,
-        similarity: result.similarity,
-        tokensSaved: result.tokens_saved
+        schema: cached.schema,
+        sql: cached.sql,
+        tokensSaved: cached.tokens_used
       });
     }
     
