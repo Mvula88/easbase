@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- Subscriptions table
 CREATE TABLE IF NOT EXISTS public.subscriptions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT UNIQUE,
   plan_id TEXT NOT NULL DEFAULT 'free',
@@ -239,21 +239,25 @@ RETURNS trigger AS $$
 BEGIN
   -- Create profile
   INSERT INTO public.profiles (id, email)
-  VALUES (new.id, new.email);
+  VALUES (new.id, new.email)
+  ON CONFLICT (id) DO NOTHING;
   
   -- Initialize usage tracking
   INSERT INTO public.user_usage (user_id)
-  VALUES (new.id);
+  VALUES (new.id)
+  ON CONFLICT (user_id) DO NOTHING;
   
   -- Create free subscription
   INSERT INTO public.subscriptions (user_id, plan_id, status)
-  VALUES (new.id, 'free', 'active');
+  VALUES (new.id, 'free', 'active')
+  ON CONFLICT (user_id) DO NOTHING;
   
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger to create profile on user signup
-CREATE OR REPLACE TRIGGER on_auth_user_created
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
