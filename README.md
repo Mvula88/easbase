@@ -2,6 +2,8 @@
 
 AI-powered backend infrastructure for modern applications. Generate production-ready database schemas, deploy authentication templates, and manage your backend infrastructure with natural language.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Mvula88/easbase)
+
 ## Features
 
 - **AI Schema Generation**: Generate PostgreSQL schemas from plain English descriptions using Claude AI
