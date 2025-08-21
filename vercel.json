@@ -3,6 +3,5 @@
   "outputDirectory": "apps/web/.next",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "root": ".",
   "ignoreCommand": "git diff HEAD^ HEAD --quiet ."
 }
