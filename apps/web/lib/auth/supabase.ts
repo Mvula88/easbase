@@ -11,16 +11,21 @@ export async function createClient() {
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return cookieStore.getAll();
+        get(name: string) {
+          return cookieStore.get(name)?.value;
         },
-        setAll(cookiesToSet) {
+        set(name: string, value: string, options?: any) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
+            cookieStore.set(name, value, options);
           } catch {
             // Cookie setting can fail in Server Components
+          }
+        },
+        remove(name: string, options?: any) {
+          try {
+            cookieStore.set(name, '', options);
+          } catch {
+            // Cookie removal can fail in Server Components
           }
         },
       },
@@ -36,10 +41,13 @@ export async function createServiceClient() {
     env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       cookies: {
-        getAll() {
-          return [];
+        get() {
+          return null;
         },
-        setAll() {
+        set() {
+          // Service role client doesn't need cookies
+        },
+        remove() {
           // Service role client doesn't need cookies
         },
       },

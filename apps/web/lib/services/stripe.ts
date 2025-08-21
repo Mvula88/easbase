@@ -7,7 +7,7 @@ export function getStripeClient() {
   if (!stripe) {
     const env = getEnv();
     stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2023-10-16',
     });
   }
   return stripe;
@@ -61,7 +61,7 @@ export async function createCheckoutSession(
   const stripe = getStripeClient();
   const plan = PLANS[planId];
 
-  if (!plan.priceId) {
+  if (planId === 'free' || !('priceId' in plan)) {
     throw new Error('Invalid plan selected');
   }
 
