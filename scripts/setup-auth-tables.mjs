@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
-const SUPABASE_URL = 'https://rgpitrwgattviyazsahf.supabase.co';
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJncGl0cndnYXR0dml5YXpzYWhmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTc2MDA3NSwiZXhwIjoyMDcxMzM2MDc1fQ.NIxr31YsCE5UxjGg0j6GeCdVU3AJR7QGySsz2pnRcUI';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-project.supabase.co';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || 'your-service-key-here';
 
 async function executeSql(sql, description) {
   console.log(`Executing: ${description}...`);

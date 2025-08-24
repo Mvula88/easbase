@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 // Initialize Supabase client with service role key
-const supabaseUrl = 'https://rgpitrwgattviyazsahf.supabase.co';
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJncGl0cndnYXR0dml5YXpzYWhmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTc2MDA3NSwiZXhwIjoyMDcxMzM2MDc1fQ.NIxr31YsCE5UxjGg0j6GeCdVU3AJR7QGySsz2pnRcUI';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-project.supabase.co';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || 'your-service-key-here';
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
