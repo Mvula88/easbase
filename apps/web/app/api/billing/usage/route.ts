@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
     };
 
     // Add usage alerts
-    Object.entries(usage.metrics).forEach(([key, metric]) => {
+    Object.entries(usage.metrics).forEach(([key, metric]: [string, any]) => {
       if (metric.percentage >= 90) {
         usage.alerts.push({
           type: 'warning',
