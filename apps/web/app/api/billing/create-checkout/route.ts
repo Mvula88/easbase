@@ -26,9 +26,9 @@ export async function POST(req: NextRequest) {
     // Determine the correct price ID based on billing period
     let finalPriceId = priceId;
     if (billingPeriod === 'annual') {
-      finalPriceId = plan.stripePriceIdAnnual || plan.stripePriceId;
+      finalPriceId = (plan as any).stripePriceIdAnnual || (plan as any).stripePriceId;
     } else {
-      finalPriceId = plan.stripePriceIdMonthly || plan.stripePriceId;
+      finalPriceId = (plan as any).stripePriceIdMonthly || (plan as any).stripePriceId;
     }
 
     // If no price ID configured, create one dynamically (for development)
