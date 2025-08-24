@@ -176,18 +176,101 @@ Generate a production-ready schema that follows best practices.`;
    * Generate schema using Claude API
    */
   private async generateWithClaude(prompt: string): Promise<any> {
-    // This would integrate with Anthropic's Claude API
-    // For now, returning a mock response
-    return this.getMockSchema();
+    if (!this.apiKey) {
+      throw new Error('Anthropic API key is required');
+    }
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 4096,
+        temperature: 0.3,
+        system: 'You are a database schema expert. Generate PostgreSQL schemas and return valid JSON only.',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Claude API error: ${error}`);
+    }
+
+    const data = await response.json();
+    const content = data.content[0].text;
+    
+    // Parse the JSON response
+    try {
+      // Extract JSON from markdown code blocks if present
+      const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[1]);
+      }
+      // Try parsing the entire response
+      return JSON.parse(content);
+    } catch (error) {
+      console.error('Failed to parse Claude response:', error);
+      // Fall back to mock if parsing fails
+      return this.getMockSchema();
+    }
   }
 
   /**
    * Generate schema using GPT-4 API
    */
   private async generateWithGPT(prompt: string): Promise<any> {
-    // This would integrate with OpenAI's GPT-4 API
-    // For now, returning a mock response
-    return this.getMockSchema();
+    if (!this.apiKey) {
+      throw new Error('OpenAI API key is required');
+    }
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4-turbo-preview',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a database schema expert. Generate PostgreSQL schemas and return valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 4096,
+        response_format: { type: 'json_object' }
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`OpenAI API error: ${error}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
+    try {
+      return JSON.parse(content);
+    } catch (error) {
+      console.error('Failed to parse GPT response:', error);
+      return this.getMockSchema();
+    }
   }
 
   /**

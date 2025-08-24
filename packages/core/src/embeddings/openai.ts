@@ -2,12 +2,12 @@ export class OpenAIEmbeddings {
   private client: any = null;
   private model = 'text-embedding-3-small'; // 1536 dimensions, optimized for cost/performance
   
-  constructor() {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (apiKey) {
+  constructor(apiKey?: string) {
+    const key = apiKey || process.env.OPENAI_API_KEY;
+    if (key) {
       try {
         const OpenAI = require('openai').default || require('openai');
-        this.client = new OpenAI({ apiKey });
+        this.client = new OpenAI({ apiKey: key });
       } catch (error) {
         console.warn('OpenAI module not available, using fallback embeddings');
       }
