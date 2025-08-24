@@ -88,13 +88,13 @@ export default async function DashboardPage() {
     backends: {
       total: projects?.length || 0,
       active: activeBackends,
-      limit: PRICING_PLANS[profile.subscription_plan || 'free']?.limits?.projects || 3,
+      limit: (PRICING_PLANS as any)[profile.subscription_plan || 'starter']?.limits?.projects || 3,
     },
     usage: {
       apiCallsToday: apiCallsToday,
-      apiCallsLimit: PRICING_PLANS[profile.subscription_plan || 'free']?.limits?.apiCalls || 10000,
+      apiCallsLimit: (PRICING_PLANS as any)[profile.subscription_plan || 'starter']?.limits?.apiCalls || 10000,
       databaseSize: totalDatabaseSize,
-      databaseLimit: PRICING_PLANS[profile.subscription_plan || 'free']?.limits?.storage || 10,
+      databaseLimit: (PRICING_PLANS as any)[profile.subscription_plan || 'starter']?.limits?.storage || 10,
     },
     projects: projects || [],
     recentDeployments: recentDeployments || [],

@@ -98,8 +98,7 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
   // Subscribe to real-time profile updates
   useEffect(() => {
     const unsubscribe = userService.subscribeToProfileChanges(
-      data.user.id,
-      (profile) => {
+      (profile: any) => {
         setData(prev => ({
           ...prev,
           subscription: {
@@ -129,7 +128,7 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
     }
 
     // Check usage limits
-    const canGenerate = await userService.checkUsageLimits('ai_generation');
+    const canGenerate = await userService.checkUsageLimits();
     if (!canGenerate) {
       toast({
         title: "Usage Limit Reached",

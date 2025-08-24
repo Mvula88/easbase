@@ -103,11 +103,11 @@ function formatUserProfile(profile: any, user: any): UserProfile {
     current_period_end: profile?.current_period_end || profile?.trial_end,
     trial_end: profile?.trial_end,
     ai_generations_used: profile?.ai_generations_used || 0,
-    ai_generations_limit: planConfig.limits.aiGenerations,
+    ai_generations_limit: (planConfig.limits as any).aiGenerations || -1,
     projects_count: profile?.projects_count || 0,
     projects_limit: planConfig.limits.projects,
     team_members_count: profile?.team_members_count || 0,
-    team_members_limit: planConfig.limits.teamMembers,
+    team_members_limit: (planConfig.limits as any).teamMembers || -1,
     cache_hits: profile?.cache_hits || 0,
     total_requests: profile?.total_requests || 0,
     onboarding_completed: profile?.onboarding_completed || false,
@@ -173,8 +173,8 @@ export async function getUsageStats() {
     return {
       aiGenerations: {
         used: profile.ai_generations_used,
-        limit: plan.limits.aiGenerations,
-        percentage: (profile.ai_generations_used / plan.limits.aiGenerations) * 100,
+        limit: (plan.limits as any).aiGenerations || -1,
+        percentage: (plan.limits as any).aiGenerations ? (profile.ai_generations_used / (plan.limits as any).aiGenerations) * 100 : 0,
       },
       projects: {
         used: profile.projects_count,
@@ -183,8 +183,8 @@ export async function getUsageStats() {
       },
       teamMembers: {
         used: profile.team_members_count,
-        limit: plan.limits.teamMembers,
-        percentage: (profile.team_members_count / plan.limits.teamMembers) * 100,
+        limit: (plan.limits as any).teamMembers || -1,
+        percentage: (plan.limits as any).teamMembers ? (profile.team_members_count / (plan.limits as any).teamMembers) * 100 : 0,
       },
       cacheHitRate: profile.total_requests > 0 
         ? (profile.cache_hits / profile.total_requests) * 100 
@@ -226,18 +226,19 @@ export async function checkUsageLimits() {
     const warnings: string[] = [];
 
     // Check AI generations
-    if (profile.ai_generations_used >= plan.limits.aiGenerations * 0.8) {
-      warnings.push(`You've used ${Math.round((profile.ai_generations_used / plan.limits.aiGenerations) * 100)}% of your AI generation limit`);
+    const aiLimit = (plan.limits as any).aiGenerations;
+    if (aiLimit && aiLimit !== -1 && profile.ai_generations_used >= aiLimit * 0.8) {
+      warnings.push(`You've used ${Math.round((profile.ai_generations_used / aiLimit) * 100)}% of your AI generation limit`);
     }
 
     // Check projects
-    if (profile.projects_count >= plan.limits.projects * 0.8) {
+    if (plan.limits.projects && plan.limits.projects !== -1 && profile.projects_count >= plan.limits.projects * 0.8) {
       warnings.push(`You've used ${Math.round((profile.projects_count / plan.limits.projects) * 100)}% of your project limit`);
     }
 
     return {
-      withinLimits: profile.ai_generations_used < plan.limits.aiGenerations &&
-                   profile.projects_count < plan.limits.projects,
+      withinLimits: (!aiLimit || aiLimit === -1 || profile.ai_generations_used < aiLimit) &&
+                   (!plan.limits.projects || plan.limits.projects === -1 || profile.projects_count < plan.limits.projects),
       warnings
     };
   } catch (error) {

@@ -580,7 +580,7 @@ export class BackendOrchestrator {
         .from('organizations')
         .select('count')
         .single();
-      status.teams = orgs?.count > 0;
+      status.teams = (orgs?.count || 0) > 0;
 
       // Check billing setup
       const { data: customers } = await this.supabase
@@ -588,18 +588,18 @@ export class BackendOrchestrator {
         .select('stripe_customer_id')
         .not('stripe_customer_id', 'is', null)
         .limit(1);
-      status.billing = customers && customers.length > 0;
+      status.billing = (customers && customers.length > 0) || false;
 
       // Check email logs
       const { data: emails } = await this.supabase
         .from('email_logs')
         .select('count')
         .single();
-      status.email = emails?.count > 0;
+      status.email = (emails?.count || 0) > 0;
 
       // Check storage buckets
       const { data: buckets } = await this.supabase.storage.listBuckets();
-      status.storage = buckets && buckets.length > 0;
+      status.storage = (buckets && buckets.length > 0) || false;
 
       // Check custom tables
       const { data: tables } = await this.supabase.rpc('get_table_count');

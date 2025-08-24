@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createServerClient } from '@/lib/auth/supabase-server';
+import { createClient as createServerClient } from '@/lib/auth/supabase-server';
 
 // API Gateway for customer backend requests
 // Routes: /api/v1/{customerId}/{resource}/{action}

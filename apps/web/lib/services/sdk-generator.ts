@@ -298,7 +298,7 @@ export default ${className};`;
     
     // Remove TypeScript-specific syntax
     let jsSDK = tsSDK
-      .replace(/export interface .+?\n}\n\n/gs, '')
+      .replace(/export interface[\s\S]+?\n}\n\n/g, '')
       .replace(/export type .+?;\n/g, '')
       .replace(/: \w+(\[\])?/g, '')
       .replace(/<.+?>/g, '')
