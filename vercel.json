@@ -1,0 +1,8 @@
+{
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build:all",
+  "outputDirectory": "apps/web/.next",
+  "rootDirectory": ".",
+  "ignoreCommand": "exit 0"
+}

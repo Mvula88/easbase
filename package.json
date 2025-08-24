@@ -7,9 +7,10 @@
     "packages/*"
   ],
   "scripts": {
+    "postinstall": "npm run build:packages",
     "dev": "npm run build:packages && npm run dev:web",
     "dev:web": "npm run dev --workspace=@easbase/web",
-    "build:packages": "npm run build --workspace=@easbase/core && npm run build --workspace=@easbase/sdk",
+    "build:packages": "npm run build --workspace=@easbase/core --if-present && npm run build --workspace=@easbase/sdk --if-present",
     "build": "npm run build:packages && npm run build --workspace=@easbase/web",
     "build:all": "npm run build:packages && npm run build --workspace=@easbase/web",
     "vercel-build": "npm run build:packages && cd apps/web && npm run build",
