@@ -53,6 +53,8 @@ import { PRICING_PLANS } from '@/lib/config/pricing';
 import * as userService from '@/lib/services/user-client';
 // User data will be passed as props from server component
 import { format } from 'date-fns';
+import { NotificationCenter } from '@/components/notifications/notification-center';
+import { HelpCenter } from '@/components/help/help-center';
 
 interface DashboardData {
   user: {
@@ -236,109 +238,15 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r transform transition-transform lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="flex h-full flex-col">
-          {/* Logo */}
-          <div className="flex h-16 items-center justify-between px-6 border-b">
-            <Link href="/" className="flex items-center">
-              <img src="/easbase-logo.png" alt="Easbase" className="h-10 w-auto" />
-            </Link>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-3 py-4">
-            <Link href="/dashboard">
-              <Button variant="ghost" className="w-full justify-start text-left font-medium">
-                <BarChart3 className="w-4 h-4 mr-3" />
-                Overview
-              </Button>
-            </Link>
-            <Link href="/dashboard/create-project">
-              <Button variant="ghost" className="w-full justify-start text-left">
-                <Rocket className="w-4 h-4 mr-3" />
-                Create Backend
-              </Button>
-            </Link>
-            <Link href="/dashboard/projects">
-              <Button variant="ghost" className="w-full justify-start text-left">
-                <Database className="w-4 h-4 mr-3" />
-                My Backends
-              </Button>
-            </Link>
-            <Link href="/dashboard/api-usage">
-              <Button variant="ghost" className="w-full justify-start text-left">
-                <Activity className="w-4 h-4 mr-3" />
-                API Usage
-              </Button>
-            </Link>
-            <Link href="/dashboard/billing">
-              <Button variant="ghost" className="w-full justify-start text-left">
-                <CreditCard className="w-4 h-4 mr-3" />
-                Billing
-              </Button>
-            </Link>
-            <Link href="/dashboard/settings">
-              <Button variant="ghost" className="w-full justify-start text-left">
-                <Settings className="w-4 h-4 mr-3" />
-                Settings
-              </Button>
-            </Link>
-          </nav>
-
-          {/* User section */}
-          <div className="border-t p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 flex items-center justify-center text-white text-sm font-medium">
-                  {data.user.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium">{data.user.name}</p>
-                  <p className="text-xs text-gray-500">{data.user.email}</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="icon" onClick={handleSignOut}>
-                <LogOut className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="lg:pl-64">
         {/* Header */}
         <header className="bg-white border-b">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
               <h1 className="text-2xl font-bold">Dashboard</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon">
-                <Bell className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <HelpCircle className="w-5 h-5" />
-              </Button>
+              <NotificationCenter />
+              <HelpCenter />
             </div>
           </div>
         </header>
@@ -666,7 +574,6 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
             </Card>
           )}
         </main>
-      </div>
     </div>
   );
 }

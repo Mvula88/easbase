@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/auth/supabase-server';
+import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 
 export default async function DashboardLayout({
   children,
@@ -28,5 +29,17 @@ export default async function DashboardLayout({
     redirect('/onboarding');
   }
 
-  return <>{children}</>;
+  return (
+    <div className="flex h-screen">
+      <DashboardSidebar 
+        user={{
+          name: profile.display_name || user.email?.split('@')[0] || 'User',
+          email: user.email || ''
+        }}
+      />
+      <main className="flex-1 lg:ml-64 overflow-y-auto">
+        {children}
+      </main>
+    </div>
+  );
 }
