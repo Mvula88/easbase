@@ -33,23 +33,31 @@ export default function HomePage() {
       <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-cyan-50 to-white">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center">
-            <Badge className="mb-4 bg-cyan-100 text-cyan-700 border-cyan-200">
-              Powered by Claude AI
+            <Badge className="mb-4 bg-green-100 text-green-700 border-green-200">
+              🚀 Launch 50% Faster · Save $40,000+
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Backend Infrastructure
+              Your Backend is Done.
               <span className="block bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent">
-                at Ease
+                Ship Your App Today.
               </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Generate production-ready database schemas, deploy authentication templates, 
-              and manage your backend infrastructure using natural language.
+            <p className="text-xl text-gray-600 mb-4 max-w-3xl mx-auto">
+              Stop building auth, teams, billing, emails, and storage from scratch.
+              Get everything working in <span className="font-bold text-gray-900">5 minutes</span>, not 5 months.
             </p>
+            <div className="flex flex-wrap justify-center gap-3 mb-8 text-sm">
+              <Badge variant="outline">✅ Authentication & SSO</Badge>
+              <Badge variant="outline">✅ Team Management</Badge>
+              <Badge variant="outline">✅ Stripe Billing</Badge>
+              <Badge variant="outline">✅ Email Service</Badge>
+              <Badge variant="outline">✅ File Storage</Badge>
+              <Badge variant="outline">✅ Admin Dashboard</Badge>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/dashboard">
+              <Link href="/signup">
                 <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white hover:from-cyan-600 hover:to-teal-600">
-                  Start Building Free
+                  Start 14-Day Free Trial
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
@@ -60,7 +68,7 @@ export default function HomePage() {
               </Link>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              No credit card required • 100 free API calls/month
+              No credit card required • 14-day free trial • Starting at $149/month
             </p>
           </div>
 
@@ -77,12 +85,19 @@ export default function HomePage() {
               </div>
               <div className="bg-gray-900 rounded p-4">
                 <code className="text-cyan-400">
-                  <span className="text-gray-400">// Generate schema with AI</span><br/>
-                  <span className="text-white">const schema = await easbase.</span>
-                  <span className="text-yellow-400">generate</span>
-                  <span className="text-white">(</span><br/>
-                  <span className="text-green-400">  "E-commerce platform with products, orders, and reviews"</span><br/>
-                  <span className="text-white">);</span>
+                  <span className="text-gray-400">{`// One command to get everything`}</span><br/>
+                  <span className="text-purple-400">npx</span>
+                  <span className="text-white"> create-easbase-app my-app</span><br/><br/>
+                  <span className="text-gray-400">{`// Everything just works`}</span><br/>
+                  <span className="text-white">await easbase.auth.</span>
+                  <span className="text-yellow-400">signUp</span>
+                  <span className="text-white">(user);</span><br/>
+                  <span className="text-white">await easbase.teams.</span>
+                  <span className="text-yellow-400">create</span>
+                  <span className="text-white">(org);</span><br/>
+                  <span className="text-white">await easbase.billing.</span>
+                  <span className="text-yellow-400">checkout</span>
+                  <span className="text-white">();</span>
                 </code>
               </div>
             </div>
@@ -95,83 +110,119 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
-              Everything You Need to Build
+              Everything Your App Needs, Pre-Built
             </h2>
             <p className="text-xl text-gray-600">
-              From schema generation to deployment, we've got you covered
+              Stop rebuilding the same features. Focus on what makes your app unique.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="border-2 hover:border-cyan-200 transition">
               <CardHeader>
-                <Sparkles className="w-10 h-10 text-cyan-500 mb-2" />
-                <CardTitle>AI Schema Generation</CardTitle>
+                <Shield className="w-10 h-10 text-cyan-500 mb-2" />
+                <CardTitle>Complete Authentication</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">
-                  Describe your app in plain English and get production-ready PostgreSQL schemas with RLS policies
+                <p className="text-gray-600 mb-3">
+                  Production-ready auth system with everything included:
                 </p>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Email & Password</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />OAuth (Google, GitHub)</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Magic Links</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />2FA/MFA Support</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 hover:border-cyan-200 transition">
+              <CardHeader>
+                <Users className="w-10 h-10 text-cyan-500 mb-2" />
+                <CardTitle>Team Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-3">
+                  Multi-tenant architecture with organizations:
+                </p>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Organizations & Teams</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Role-based Access</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Invitations System</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Permissions</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 hover:border-cyan-200 transition">
+              <CardHeader>
+                <DollarSign className="w-10 h-10 text-cyan-500 mb-2" />
+                <CardTitle>Stripe Billing</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-3">
+                  Complete billing system integrated:
+                </p>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Subscriptions</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Usage-based Billing</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Customer Portal</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Webhooks</li>
+                </ul>
               </CardContent>
             </Card>
 
             <Card className="border-2 hover:border-cyan-200 transition">
               <CardHeader>
                 <Zap className="w-10 h-10 text-cyan-500 mb-2" />
-                <CardTitle>Smart Caching</CardTitle>
+                <CardTitle>Email & SMS</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">
-                  Save up to 95% on AI costs with vector-based similarity search and intelligent response caching
+                <p className="text-gray-600 mb-3">
+                  Communications ready to go:
                 </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-cyan-200 transition">
-              <CardHeader>
-                <Shield className="w-10 h-10 text-cyan-500 mb-2" />
-                <CardTitle>Auth Templates</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Pre-built authentication patterns for SaaS, marketplaces, and social apps ready to deploy
-                </p>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Transactional Emails</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Email Templates</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />SMS/OTP</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Bulk Sending</li>
+                </ul>
               </CardContent>
             </Card>
 
             <Card className="border-2 hover:border-cyan-200 transition">
               <CardHeader>
                 <Database className="w-10 h-10 text-cyan-500 mb-2" />
-                <CardTitle>Direct Deployment</CardTitle>
+                <CardTitle>File Storage</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">
-                  Deploy schemas directly to your Supabase projects with one click and automatic rollback support
+                <p className="text-gray-600 mb-3">
+                  Secure file handling built-in:
                 </p>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Direct Uploads</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />CDN Delivery</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Image Processing</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Signed URLs</li>
+                </ul>
               </CardContent>
             </Card>
 
             <Card className="border-2 hover:border-cyan-200 transition">
               <CardHeader>
-                <Code className="w-10 h-10 text-cyan-500 mb-2" />
-                <CardTitle>SDK & CLI</CardTitle>
+                <Layers className="w-10 h-10 text-cyan-500 mb-2" />
+                <CardTitle>Admin Dashboard</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">
-                  Integrate Easbase into your workflow with our TypeScript SDK and command-line tools
+                <p className="text-gray-600 mb-3">
+                  Pre-built admin panel included:
                 </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-cyan-200 transition">
-              <CardHeader>
-                <Lock className="w-10 h-10 text-cyan-500 mb-2" />
-                <CardTitle>Enterprise Security</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Your data stays in your infrastructure. We never store your database credentials
-                </p>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />User Management</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Analytics</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Billing Overview</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Activity Logs</li>
+                </ul>
               </CardContent>
             </Card>
           </div>
@@ -183,20 +234,20 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-cyan-500 mb-2">95%</div>
-              <div className="text-gray-600">Cost Reduction</div>
+              <div className="text-4xl font-bold text-cyan-500 mb-2">5min</div>
+              <div className="text-gray-600">To Production</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-cyan-500 mb-2">10x</div>
-              <div className="text-gray-600">Faster Development</div>
+              <div className="text-4xl font-bold text-cyan-500 mb-2">$40k+</div>
+              <div className="text-gray-600">Development Saved</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-cyan-500 mb-2">0ms</div>
-              <div className="text-gray-600">Cache Latency</div>
+              <div className="text-4xl font-bold text-cyan-500 mb-2">1 API</div>
+              <div className="text-gray-600">For Everything</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-cyan-500 mb-2">100%</div>
-              <div className="text-gray-600">PostgreSQL Compatible</div>
+              <div className="text-4xl font-bold text-cyan-500 mb-2">24/7</div>
+              <div className="text-gray-600">Support Included</div>
             </div>
           </div>
         </div>
@@ -207,10 +258,10 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
-              How It Works
+              Start Building in 3 Steps
             </h2>
             <p className="text-xl text-gray-600">
-              Three simple steps to production-ready infrastructure
+              From zero to production-ready backend in minutes
             </p>
           </div>
 
@@ -219,9 +270,9 @@ export default function HomePage() {
               <div className="w-16 h-16 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
-              <h3 className="text-xl font-semibold mb-2">Describe Your App</h3>
+              <h3 className="text-xl font-semibold mb-2">Run One Command</h3>
               <p className="text-gray-600">
-                Tell us what you're building in plain English. No SQL knowledge required.
+                <code className="bg-gray-100 px-2 py-1 rounded text-sm">npx create-easbase-app</code>
               </p>
             </div>
 
@@ -229,9 +280,9 @@ export default function HomePage() {
               <div className="w-16 h-16 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
-              <h3 className="text-xl font-semibold mb-2">AI Generates Schema</h3>
+              <h3 className="text-xl font-semibold mb-2">Everything Configured</h3>
               <p className="text-gray-600">
-                Claude AI creates optimized PostgreSQL schemas with security best practices.
+                Auth, teams, billing, emails, storage - all set up and ready to use.
               </p>
             </div>
 
@@ -239,9 +290,9 @@ export default function HomePage() {
               <div className="w-16 h-16 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
-              <h3 className="text-xl font-semibold mb-2">Deploy Instantly</h3>
+              <h3 className="text-xl font-semibold mb-2">Ship Your App</h3>
               <p className="text-gray-600">
-                One-click deployment to your Supabase project with automatic rollback support.
+                Focus on your unique features. The backend infrastructure is done.
               </p>
             </div>
           </div>
@@ -252,21 +303,26 @@ export default function HomePage() {
       <section className="py-20 px-6 bg-gradient-to-r from-cyan-500 to-teal-500">
         <div className="container mx-auto max-w-4xl text-center text-white">
           <h2 className="text-4xl font-bold mb-4">
-            Ready to Build Faster?
+            Stop Building. Start Shipping.
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of developers building backends 10x faster with AI
+            Get your complete backend in 5 minutes. Save $40,000 in development costs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/dashboard">
+            <Link href="/signup">
               <Button size="lg" className="bg-white text-cyan-600 hover:bg-gray-100">
-                Get Started Free
+                Start Free Trial
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                Talk to Sales
+              <Button 
+                size="lg" 
+                style={{ backgroundColor: 'white', color: '#0891b2' }}
+                className="hover:opacity-90 font-semibold"
+              >
+                <Users className="w-5 h-5 mr-2" style={{ color: '#0891b2' }} />
+                <span style={{ color: '#0891b2' }}>Talk to Sales</span>
               </Button>
             </Link>
           </div>

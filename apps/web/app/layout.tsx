@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Easbase - Backend Infrastructure at Ease',
-  description: 'AI-powered backend infrastructure for modern applications',
+  description: 'Intelligent backend infrastructure for modern applications',
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { handleWebhook, PLANS } from '@/lib/services/stripe';
 import { createServiceClient } from '@/lib/auth/supabase';
+import { DatabaseProvisioningService } from '@/lib/services/database-provisioning';
 import Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
@@ -42,6 +43,51 @@ export async function POST(req: NextRequest) {
             deployments_limit: plan.deployments,
             projects_limit: plan.projects,
           });
+
+        // MODEL B: Automatically provision database for new paid customers
+        if (planId !== 'free') {
+          try {
+            const provisioning = new DatabaseProvisioningService();
+            
+            // Get user email
+            const { data: userData } = await supabase.auth.admin.getUserById(userId);
+            const userEmail = userData?.user?.email || `user-${userId}@easbase.com`;
+            
+            // Check if customer already has a project
+            const { data: existingProject } = await supabase
+              .from('customer_projects')
+              .select('id')
+              .eq('customer_id', userId)
+              .single();
+            
+            if (!existingProject) {
+              console.log(`Provisioning database for customer ${userId}...`);
+              
+              // Create database project for customer
+              const project = await provisioning.createProject(
+                userId,
+                userEmail,
+                planId === 'enterprise' ? 'pro' : 'free'
+              );
+              
+              // Store project info in our database
+              await supabase
+                .from('customer_projects')
+                .insert({
+                  customer_id: userId,
+                  supabase_project_id: project.id,
+                  project_name: project.name,
+                  project_url: `https://${project.id}.supabase.co`,
+                  project_status: 'active'
+                });
+              
+              console.log(`Database provisioned successfully for customer ${userId}`);
+            }
+          } catch (error) {
+            console.error(`Failed to provision database for customer ${userId}:`, error);
+            // Don't fail the webhook, but log for manual intervention
+          }
+        }
 
         break;
       }

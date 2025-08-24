@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { Mail, MessageSquare, Phone, MapPin, Clock, Send } from 'lucide-react';
+import { Mail, MessageSquare, MapPin, Clock, Send } from 'lucide-react';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -24,12 +24,26 @@ export default function ContactPage() {
     e.preventDefault();
     setLoading(true);
     
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+
       toast({
         title: "Message sent!",
         description: "We'll get back to you within 24 hours.",
       });
+      
       setFormData({
         name: '',
         email: '',
@@ -37,8 +51,15 @@ export default function ContactPage() {
         subject: '',
         message: ''
       });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -89,16 +110,6 @@ export default function ContactPage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <Phone className="w-10 h-10 text-cyan-500 mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Call Us</h3>
-                <p className="text-gray-600 text-sm mb-2">For enterprise sales</p>
-                <a href="tel:+1-555-0123" className="text-cyan-500 hover:text-cyan-600">
-                  +1 (555) 0123
-                </a>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>

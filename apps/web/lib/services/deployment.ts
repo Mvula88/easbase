@@ -1,5 +1,6 @@
 import { createServiceClient } from '@/lib/auth/supabase';
 import { getEnv } from '@/lib/config/env';
+import { SupabaseManagementService } from './supabase-management';
 
 export interface DeploymentResult {
   success: boolean;
@@ -9,10 +10,10 @@ export interface DeploymentResult {
 }
 
 export class DeploymentService {
-  private supabase;
+  private managementService: SupabaseManagementService;
 
   constructor() {
-    this.supabase = createServiceClient();
+    this.managementService = new SupabaseManagementService();
   }
 
   async deployToSupabase(
@@ -23,7 +24,7 @@ export class DeploymentService {
   ): Promise<DeploymentResult> {
     try {
       // 1. Create deployment record
-      const supabase = await this.supabase;
+      const supabase = await createServiceClient();
       const { data: deployment, error: deployError } = await supabase
         .from('deployments')
         .insert({
@@ -90,7 +91,7 @@ export class DeploymentService {
   }
 
   private async createBackup(projectId: string, deploymentId: string) {
-    const supabase = await this.supabase;
+    const supabase = await createServiceClient();
     
     // Get current schema
     const currentSchema = await this.getCurrentSchema(projectId);
@@ -114,13 +115,11 @@ export class DeploymentService {
   }
 
   private async getCurrentSchema(projectId: string): Promise<any> {
-    // In production, this would connect to the project's Supabase instance
-    // and dump the current schema
-    const supabase = await this.supabase;
+    const supabase = await createServiceClient();
     
     const { data: project } = await supabase
       .from('projects')
-      .select('supabase_url, supabase_anon_key')
+      .select('supabase_url, supabase_anon_key, supabase_service_key')
       .eq('id', projectId)
       .single();
 
@@ -128,22 +127,27 @@ export class DeploymentService {
       throw new Error('Project not found');
     }
 
-    // For now, return a mock schema
-    // In production, use pg_dump or Supabase Management API
+    // Get actual schema from the project's Supabase instance
+    const schemaInfo = await this.managementService.getSchemaInfo({
+      url: project.supabase_url,
+      anonKey: project.supabase_anon_key,
+      serviceKey: project.supabase_service_key
+    });
+
     return {
-      tables: [],
+      ...schemaInfo,
       version: '1.0.0',
       timestamp: new Date().toISOString(),
     };
   }
 
   private async executeSQLMigration(projectId: string, sql: string): Promise<void> {
-    const supabase = await this.supabase;
+    const supabase = await createServiceClient();
     
     // Get project database credentials
     const { data: project } = await supabase
       .from('projects')
-      .select('supabase_url, supabase_service_key')
+      .select('supabase_url, supabase_service_key, supabase_anon_key')
       .eq('id', projectId)
       .single();
 
@@ -151,22 +155,39 @@ export class DeploymentService {
       throw new Error('Project not found');
     }
 
-    // In production, this would:
-    // 1. Connect to the project's Supabase database
-    // 2. Execute the SQL in a transaction
-    // 3. Validate the changes
-    
-    // For now, simulate the deployment
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Random failure for testing (10% chance)
-    if (Math.random() < 0.1) {
-      throw new Error('SQL execution failed: syntax error at line 42');
+    // Test connection first
+    const connectionTest = await this.managementService.testConnection({
+      url: project.supabase_url,
+      anonKey: project.supabase_anon_key,
+      serviceKey: project.supabase_service_key
+    });
+
+    if (!connectionTest.connected) {
+      throw new Error(`Failed to connect to Supabase: ${connectionTest.error}`);
+    }
+
+    // Execute actual SQL migration
+    const result = await this.managementService.executeSql(
+      {
+        url: project.supabase_url,
+        anonKey: project.supabase_anon_key,
+        serviceKey: project.supabase_service_key
+      },
+      sql,
+      {
+        validateBeforeExecute: true,
+        transactional: true,
+        timeout: 60000 // 60 seconds timeout
+      }
+    );
+
+    if (!result.success) {
+      throw new Error(result.error || 'SQL execution failed');
     }
   }
 
   async rollback(projectId: string, backupId: string): Promise<void> {
-    const supabase = await this.supabase;
+    const supabase = await createServiceClient();
     
     // Get backup
     const { data: backup } = await supabase
@@ -224,15 +245,29 @@ export class DeploymentService {
   }
 
   private generateRollbackSQL(schemaSnapshot: any): string {
-    // In production, this would generate proper rollback SQL
-    // based on the schema snapshot
-    return `-- Rollback SQL
--- This would restore the previous schema state
--- Generated from backup snapshot`;
+    // Generate rollback SQL based on the schema snapshot
+    let rollbackSql = `-- Rollback SQL generated at ${new Date().toISOString()}\n\n`;
+    
+    // Drop new tables (would need to track what was added)
+    rollbackSql += `-- Drop any newly created tables\n`;
+    
+    // Restore previous table structures
+    if (schemaSnapshot.tables && schemaSnapshot.tables.length > 0) {
+      rollbackSql += `-- Restore previous table structures\n`;
+      // In a real implementation, would generate CREATE TABLE statements
+    }
+    
+    // Restore policies
+    if (schemaSnapshot.policies && schemaSnapshot.policies.length > 0) {
+      rollbackSql += `-- Restore RLS policies\n`;
+      // Would generate CREATE POLICY statements
+    }
+    
+    return rollbackSql;
   }
 
   async getDeploymentStatus(deploymentId: string) {
-    const supabase = await this.supabase;
+    const supabase = await createServiceClient();
     
     const { data: deployment } = await supabase
       .from('deployments')
@@ -244,7 +279,7 @@ export class DeploymentService {
   }
 
   async getDeploymentHistory(projectId: string, limit = 10) {
-    const supabase = await this.supabase;
+    const supabase = await createServiceClient();
     
     const { data: deployments } = await supabase
       .from('deployments')

@@ -4,10 +4,16 @@ const envSchema = z.object({
   // Anthropic
   ANTHROPIC_API_KEY: z.string().min(1, "Anthropic API key is required"),
   
-  // Supabase
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url("Invalid Supabase URL"),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, "Supabase anon key is required"),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, "Supabase service role key is required"),
+  // Database
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url("Invalid Database URL"),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, "Database anon key is required"),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, "Database service role key is required").optional().or(z.undefined()),
+  SUPABASE_SERVICE_KEY: z.string().min(1, "Database service key is required").optional().or(z.undefined()),
+  
+  // Database Management API (for Model B)
+  SUPABASE_ACCESS_TOKEN: z.string().min(1, "Database access token for Management API").optional(),
+  SUPABASE_ORGANIZATION_ID: z.string().min(1, "Database organization ID").optional(),
+  SUPABASE_MANAGEMENT_API_URL: z.string().url().default("https://api.supabase.com"),
   
   // Stripe
   STRIPE_SECRET_KEY: z.string().min(1, "Stripe secret key is required"),
@@ -21,7 +27,13 @@ const envSchema = z.object({
   // Rate Limiting
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().positive().default(100),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().positive().default(60000),
-});
+}).refine(
+  (data) => data.SUPABASE_SERVICE_ROLE_KEY || data.SUPABASE_SERVICE_KEY,
+  {
+    message: "Either SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_KEY must be provided",
+    path: ["SUPABASE_SERVICE_ROLE_KEY"],
+  }
+);
 
 export type Env = z.infer<typeof envSchema>;
 

@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { OpenAIEmbeddings } from '../embeddings/openai';
 
 interface CachedResult {
   id: string;
@@ -14,18 +15,21 @@ interface CachedResult {
 
 export class CacheManager {
   private supabase: SupabaseClient;
+  private embeddings: OpenAIEmbeddings;
   
   constructor() {
     this.supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY!
     );
+    this.embeddings = new OpenAIEmbeddings();
   }
 
-  async findSimilar(prompt: string, threshold: number = 0.95): Promise<CachedResult | null> {
-    const embedding = await this.generateEmbedding(prompt);
+  async findSimilar(prompt: string, threshold: number = 0.85): Promise<CachedResult | null> {
+    const embedding = await this.embeddings.generateEmbedding(prompt);
     
     // PostgreSQL function for vector similarity search
+    // Lower threshold for semantic similarity (0.85 vs 0.95 for hash-based)
     const { data } = await this.supabase.rpc('find_similar_schemas', {
       query_embedding: embedding,
       similarity_threshold: threshold,
@@ -33,6 +37,9 @@ export class CacheManager {
     });
     
     if (data && data.length > 0) {
+      // Log similarity score for monitoring
+      console.log(`Cache hit with similarity: ${data[0].similarity || 'N/A'}`);
+      
       // Update usage count and last used
       await this.supabase
         .from('cache')
@@ -53,7 +60,7 @@ export class CacheManager {
     result: { schema: any; sql: string },
     tokensUsed: number = 0
   ): Promise<void> {
-    const embedding = await this.generateEmbedding(prompt);
+    const embedding = await this.embeddings.generateEmbedding(prompt);
     const cacheKey = this.generateCacheKey(prompt);
     
     await this.supabase.from('cache').upsert({
@@ -63,7 +70,8 @@ export class CacheManager {
       response_schema: result.schema,
       response_sql: result.sql,
       model_used: 'claude-3-opus-20240229',
-      tokens_saved: tokensUsed
+      tokens_saved: tokensUsed,
+      embedding_model: this.embeddings.getModel()
     });
   }
 
@@ -113,16 +121,44 @@ export class CacheManager {
     return (tokensUsed / 1000) * avgCostPer1kTokens;
   }
 
-  private async generateEmbedding(text: string): Promise<number[]> {
-    // Use a hash-based approach for now (Claude doesn't have embeddings API yet)
-    const hash = crypto.createHash('sha256').update(text.toLowerCase().trim()).digest();
-    const embedding = Array.from(hash).map(byte => byte / 255);
+  // Method for batch processing multiple prompts
+  async warmCache(prompts: string[]): Promise<void> {
+    const embeddings = await this.embeddings.generateBatchEmbeddings(prompts);
     
-    // Pad to 1536 dimensions
-    while (embedding.length < 1536) {
-      embedding.push(0);
+    // Store embeddings for future similarity matching
+    for (let i = 0; i < prompts.length; i++) {
+      const cacheKey = this.generateCacheKey(prompts[i]);
+      
+      // Check if already cached
+      const { data: existing } = await this.supabase
+        .from('cache')
+        .select('id')
+        .eq('cache_key', cacheKey)
+        .single();
+      
+      if (!existing) {
+        // Pre-cache the embedding for faster future lookups
+        await this.supabase.from('cache').insert({
+          cache_key: cacheKey,
+          prompt: prompts[i],
+          prompt_embedding: embeddings[i],
+          response_schema: null,
+          response_sql: null,
+          model_used: 'pre-cached',
+          tokens_saved: 0,
+          embedding_model: this.embeddings.getModel()
+        });
+      }
     }
-    return embedding.slice(0, 1536);
+  }
+
+  // Get embedding status for monitoring
+  getEmbeddingStatus(): { configured: boolean; model: string; fallback: boolean } {
+    return {
+      configured: this.embeddings.isConfigured(),
+      model: this.embeddings.getModel(),
+      fallback: !this.embeddings.isConfigured()
+    };
   }
 
   private generateCacheKey(prompt: string): string {

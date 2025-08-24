@@ -37,21 +37,28 @@ export default function AboutPage() {
           <div className="prose prose-lg max-w-none">
             <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
             <p className="text-gray-600 mb-8">
-              At Easbase, we're on a mission to democratize backend development. We believe that creating 
-              robust, scalable infrastructure shouldn't require years of database expertise or deep pockets 
-              for specialized engineers.
+              At Easbase, we're revolutionizing how developers create backend infrastructure. Our intelligent 
+              Backend-as-a-Service platform generates complete, production-ready backends in 60 seconds – 
+              including databases, authentication, APIs, and more.
             </p>
             
             <p className="text-gray-600 mb-8">
-              Founded in 2024 by a team of engineers who've spent years building infrastructure at scale, 
-              we've experienced firsthand the repetitive nature of backend development. Every new project 
-              starts with the same questions: How should we structure our database? What authentication 
-              pattern should we use? How do we ensure security best practices?
+              Founded in 2024 by engineers frustrated with rebuilding the same infrastructure for every project, 
+              we asked ourselves: Why does every app need months of backend development when 80% of the requirements 
+              are identical? Why do startups spend $40,000+ and 3-6 months before they can even validate their idea?
+            </p>
+
+            <p className="text-gray-600 mb-8">
+              That's why we built Easbase – a platform that understands your business requirements 
+              and instantly generates a complete backend. Just describe what you're building, and our advanced 
+              engine creates your entire database schema, sets up authentication, configures APIs, and even generates 
+              SDKs in your preferred language.
             </p>
 
             <p className="text-gray-600 mb-12">
-              That's why we built Easbase – to let AI handle the repetitive parts while you focus on what 
-              makes your application unique.
+              We're not just another boilerplate or template. Easbase creates truly custom backends tailored to 
+              your specific needs, whether you're building an e-commerce platform, SaaS application, marketplace, 
+              or something entirely unique. Focus on your product, not your infrastructure.
             </p>
           </div>
 
@@ -95,77 +102,25 @@ export default function AboutPage() {
           
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-cyan-500 mb-2">10,000+</div>
-              <div className="text-gray-600">Developers</div>
+              <div className="text-4xl font-bold text-cyan-500 mb-2">60 sec</div>
+              <div className="text-gray-600">To Production Backend</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-cyan-500 mb-2">1M+</div>
-              <div className="text-gray-600">Schemas Generated</div>
+              <div className="text-4xl font-bold text-cyan-500 mb-2">95%</div>
+              <div className="text-gray-600">Development Time Saved</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-cyan-500 mb-2">$2M+</div>
-              <div className="text-gray-600">Saved in AI Costs</div>
+              <div className="text-4xl font-bold text-cyan-500 mb-2">$40k+</div>
+              <div className="text-gray-600">Average Cost Savings</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-cyan-500 mb-2">99.9%</div>
-              <div className="text-gray-600">Uptime</div>
+              <div className="text-4xl font-bold text-cyan-500 mb-2">100%</div>
+              <div className="text-gray-600">Custom to Your Needs</div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-20 px-6">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold text-center mb-12">Meet the Team</h2>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="w-24 h-24 bg-gradient-to-r from-cyan-400 to-teal-400 rounded-full mx-auto mb-4"></div>
-                <h3 className="font-semibold">Sarah Chen</h3>
-                <p className="text-gray-600 text-sm mb-2">CEO & Co-founder</p>
-                <p className="text-gray-500 text-xs">
-                  Former Google engineer with 10+ years building distributed systems
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="w-24 h-24 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mx-auto mb-4"></div>
-                <h3 className="font-semibold">Alex Kumar</h3>
-                <p className="text-gray-600 text-sm mb-2">CTO & Co-founder</p>
-                <p className="text-gray-500 text-xs">
-                  AI researcher and former Meta infrastructure lead
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="w-24 h-24 bg-gradient-to-r from-orange-400 to-red-400 rounded-full mx-auto mb-4"></div>
-                <h3 className="font-semibold">Jordan Park</h3>
-                <p className="text-gray-600 text-sm mb-2">Head of Product</p>
-                <p className="text-gray-500 text-xs">
-                  Product leader with experience at Stripe and Vercel
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="text-center mt-12">
-            <p className="text-gray-600 mb-6">
-              Want to join our mission?
-            </p>
-            <Link href="/careers">
-              <Button>
-                View Open Positions
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       <section className="py-20 px-6 bg-gradient-to-r from-cyan-500 to-teal-500">
         <div className="container mx-auto max-w-4xl text-center text-white">
@@ -173,7 +128,7 @@ export default function AboutPage() {
             Ready to Transform Your Development?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of developers building backends faster with AI
+            Join thousands of developers building backends faster
           </p>
           <Link href="/dashboard">
             <Button size="lg" className="bg-white text-cyan-600 hover:bg-gray-100">

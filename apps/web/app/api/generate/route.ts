@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/middleware';
 import { createServiceClient } from '@/lib/auth/supabase';
-import { generateSchema, calculateTokenUsage } from '@/lib/services/claude';
+import { generateSchema, calculateTokenUsage } from '@/lib/services/ai-service';
+import { WebhookService } from '@/lib/services/webhook';
 import { z } from 'zod';
 
 const requestSchema = z.object({
@@ -41,6 +42,16 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (cached) {
+        // Trigger webhook for cached result
+        const webhookService = new WebhookService();
+        await webhookService.triggerEvent('schema.cached', user.id, {
+          prompt,
+          schema: cached.schema,
+          sql: cached.sql,
+          tokensSaved: cached.tokens_used,
+          costSaved: calculateCostSaved(cached.tokens_used)
+        });
+
         return NextResponse.json({
           success: true,
           schema: cached.schema,
@@ -89,7 +100,26 @@ export async function POST(req: NextRequest) {
       tokens: tokensUsed,
     });
 
-    // 8. Return response
+    // 8. Trigger webhook for new generation
+    const webhookService = new WebhookService();
+    await webhookService.triggerEvent('schema.generated', user.id, {
+      prompt,
+      schema: result.tables,
+      sql: result.sql,
+      tokensUsed,
+      projectId
+    });
+
+    // 9. Check if approaching limit and trigger webhook
+    if (usage && (usage.tokens_used + tokensUsed) > (usage.tokens_limit * 0.9)) {
+      await webhookService.triggerEvent('usage.limit_reached', user.id, {
+        used: usage.tokens_used + tokensUsed,
+        limit: usage.tokens_limit,
+        percentageUsed: ((usage.tokens_used + tokensUsed) / usage.tokens_limit * 100).toFixed(2)
+      });
+    }
+
+    // 10. Return response
     return NextResponse.json({
       success: true,
       schema: result.tables,

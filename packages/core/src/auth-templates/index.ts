@@ -16,7 +16,7 @@ export class AuthTemplateManager {
   constructor() {
     this.supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY!
     );
   }
 
@@ -517,3 +517,6 @@ export class AuthTemplateManager {
     return this.templates[slug];
   }
 }
+
+// Export alias for compatibility
+export const AuthTemplateService = AuthTemplateManager;

@@ -1,0 +1,47 @@
+{
+  "name": "create-easbase-app",
+  "version": "1.0.0",
+  "description": "Create a fully-configured backend with authentication, teams, billing, emails, and storage in minutes",
+  "bin": {
+    "create-easbase-app": "./bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "templates",
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "easbase",
+    "backend",
+    "auth",
+    "teams",
+    "billing",
+    "saas",
+    "starter"
+  ],
+  "author": "Easbase",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^9.2.12",
+    "ora": "^7.0.1",
+    "validate-npm-package-name": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.10.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

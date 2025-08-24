@@ -27,6 +27,58 @@ interface CachedSchema {
   tokensSaved?: number;
 }
 
+interface CacheStatus {
+  cache: {
+    totalCached: number;
+    totalHits: number;
+    totalTokensSaved: number;
+    avgSimilarity: number;
+    hitRate: string;
+    costSaved: string;
+  };
+  embeddings: {
+    configured: boolean;
+    model: string;
+    fallback: boolean;
+    recommendation: string;
+  };
+}
+
+interface WebhookSubscription {
+  id?: string;
+  url: string;
+  events: string[];
+  secret?: string;
+  headers?: Record<string, string>;
+  active?: boolean;
+}
+
+interface WebhookEvent {
+  id: string;
+  type: string;
+  payload: any;
+  timestamp: string;
+}
+
+interface CodeGenerationOptions {
+  schemaId: string;
+  language: string;
+  framework?: string;
+  includeValidation?: boolean;
+  includeComments?: boolean;
+  includeTests?: boolean;
+}
+
+interface GeneratedCode {
+  language: string;
+  framework?: string;
+  files: Array<{
+    path: string;
+    content: string;
+    type: string;
+  }>;
+}
+
 export class EasbaseClient {
   private apiKey: string;
   private baseUrl: string;
@@ -197,6 +249,171 @@ export class EasbaseClient {
     }
 
     return await response.json() as { id: string };
+  }
+
+  /**
+   * Get cache status and embedding configuration
+   */
+  async getCacheStatus(): Promise<CacheStatus> {
+    const response = await fetch(`${this.baseUrl}/api/cache/status`, {
+      headers: {
+        'x-api-key': this.apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Easbase API error: ${response.statusText} - ${error}`);
+    }
+
+    return await response.json() as CacheStatus;
+  }
+
+  /**
+   * Create a webhook subscription
+   */
+  async createWebhook(webhook: WebhookSubscription): Promise<WebhookSubscription> {
+    const response = await fetch(`${this.baseUrl}/api/webhooks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey,
+      },
+      body: JSON.stringify(webhook),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Easbase API error: ${response.statusText} - ${error}`);
+    }
+
+    const result = await response.json();
+    return result.subscription;
+  }
+
+  /**
+   * List webhook subscriptions
+   */
+  async listWebhooks(): Promise<WebhookSubscription[]> {
+    const response = await fetch(`${this.baseUrl}/api/webhooks`, {
+      headers: {
+        'x-api-key': this.apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Easbase API error: ${response.statusText} - ${error}`);
+    }
+
+    const result = await response.json();
+    return result.subscriptions;
+  }
+
+  /**
+   * Update a webhook subscription
+   */
+  async updateWebhook(subscriptionId: string, updates: Partial<WebhookSubscription>): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/api/webhooks`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey,
+      },
+      body: JSON.stringify({ subscriptionId, ...updates }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Easbase API error: ${response.statusText} - ${error}`);
+    }
+  }
+
+  /**
+   * Disable a webhook subscription
+   */
+  async disableWebhook(subscriptionId: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/api/webhooks?subscriptionId=${subscriptionId}`, {
+      method: 'DELETE',
+      headers: {
+        'x-api-key': this.apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Easbase API error: ${response.statusText} - ${error}`);
+    }
+  }
+
+  /**
+   * Generate code from schema
+   */
+  async generateCode(options: CodeGenerationOptions): Promise<GeneratedCode> {
+    const response = await fetch(`${this.baseUrl}/api/generate/code`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey,
+      },
+      body: JSON.stringify(options),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Easbase API error: ${response.statusText} - ${error}`);
+    }
+
+    return await response.json() as GeneratedCode;
+  }
+
+  /**
+   * Get supported languages and frameworks for code generation
+   */
+  async getSupportedLanguages(): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/api/generate/code`, {
+      headers: {
+        'x-api-key': this.apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Easbase API error: ${response.statusText} - ${error}`);
+    }
+
+    return await response.json();
+  }
+
+  /**
+   * Verify webhook signature (for receiving webhooks)
+   */
+  static verifyWebhookSignature(
+    payload: string,
+    signature: string,
+    secret: string
+  ): boolean {
+    const crypto = require('crypto');
+    const parts = signature.split(',');
+    const timestamp = parseInt(parts[0].replace('t=', ''));
+    const receivedSig = parts[1].replace('v1=', '');
+
+    // Check timestamp (5 minute tolerance)
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (currentTime - timestamp > 300) {
+      return false;
+    }
+
+    // Verify signature
+    const expectedSig = crypto
+      .createHmac('sha256', secret)
+      .update(`${timestamp}.${payload}`)
+      .digest('hex');
+
+    return crypto.timingSafeEqual(
+      Buffer.from(receivedSig),
+      Buffer.from(expectedSig)
+    );
   }
 }
 

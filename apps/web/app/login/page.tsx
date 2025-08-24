@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
+import { createClient } from '@/lib/auth/supabase-client';
 import { Mail, Lock, Eye, EyeOff, Github, Chrome, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
@@ -16,6 +17,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const supabase = createClient();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -35,31 +38,74 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Simulate authentication
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // For demo purposes, accept any email/password
-      if (formData.email && formData.password) {
+      // Sign in with database
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (signInError) {
+        if (signInError.message === 'Invalid login credentials') {
+          setError('Invalid email or password. Please check your credentials and try again.');
+        } else if (signInError.message === 'Email not confirmed') {
+          setError('Please verify your email address before signing in. Check your inbox for the confirmation link.');
+        } else {
+          setError(signInError.message);
+        }
+        return;
+      }
+
+      if (data?.user) {
+        // Check if user has completed onboarding
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('onboarding_completed')
+          .eq('id', data.user.id)
+          .single();
+        
         toast({
           title: "Welcome back!",
           description: "You've successfully logged in.",
         });
-        router.push('/dashboard');
-      } else {
-        setError('Please enter your email and password');
+        
+        // Redirect based on onboarding status
+        if (!profile?.onboarding_completed) {
+          router.push('/onboarding');
+        } else {
+          router.push('/dashboard');
+        }
+        router.refresh();
       }
-    } catch (err) {
-      setError('Invalid email or password');
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during sign in');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    toast({
-      title: "Coming soon!",
-      description: `${provider} login will be available soon.`,
-    });
+  const handleSocialLogin = async (provider: 'github' | 'google') => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: "Failed to sign in with " + provider,
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -67,17 +113,18 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex justify-center">
+          <Link href="/" className="inline-flex flex-col items-center justify-center">
             <Image 
-              src="/logo.svg" 
+              src="/easbase-logo.png" 
               alt="Easbase Logo" 
-              width={150} 
-              height={40} 
+              width={200} 
+              height={60} 
               priority
-              className="h-10 w-auto"
+              className="mb-2"
             />
+            <p className="text-sm text-gray-500">Backend Infrastructure at Ease</p>
           </Link>
-          <p className="text-gray-600 mt-2">Welcome back</p>
+          <p className="text-gray-600 mt-4 text-lg">Welcome back</p>
         </div>
 
         <Card>
@@ -183,8 +230,9 @@ export default function LoginPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => handleSocialLogin('GitHub')}
+                  onClick={() => handleSocialLogin('github')}
                   className="w-full"
+                  disabled={loading}
                 >
                   <Github className="w-5 h-5 mr-2" />
                   GitHub
@@ -192,8 +240,9 @@ export default function LoginPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => handleSocialLogin('Google')}
+                  onClick={() => handleSocialLogin('google')}
                   className="w-full"
+                  disabled={loading}
                 >
                   <Chrome className="w-5 h-5 mr-2" />
                   Google

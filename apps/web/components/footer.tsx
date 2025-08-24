@@ -11,7 +11,7 @@ export function Footer() {
           <div>
             <div className="mb-4">
               <Image 
-                src="/logo.svg" 
+                src="/easbase-logo.png" 
                 alt="Easbase Logo" 
                 width={120} 
                 height={30} 
@@ -19,7 +19,7 @@ export function Footer() {
               />
             </div>
             <p className="text-gray-400">
-              AI-powered backend infrastructure for modern applications
+              Intelligent backend infrastructure for modern applications
             </p>
             <div className="flex space-x-4 mt-4">
               <a href="https://github.com" className="text-gray-400 hover:text-cyan-400">
@@ -117,8 +117,13 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 Easbase. All rights reserved.</p>
+        <div className="border-t border-gray-800 mt-12 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
+            <p>&copy; 2025 Easbase. All rights reserved.</p>
+            <p className="mt-2 md:mt-0">
+              8195, 1021 E Lincolnway, Cheyenne, WY, Laramie, US, 82001, United States
+            </p>
+          </div>
         </div>
       </div>
     </footer>
