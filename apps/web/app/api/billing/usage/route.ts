@@ -188,10 +188,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user's customer ID
+    // Get user's customer ID and usage counters
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('stripe_customer_id')
+      .select('stripe_customer_id, emails_sent, sms_sent')
       .eq('id', user.id)
       .single();
 
@@ -237,9 +237,9 @@ export async function POST(request: NextRequest) {
     // Update profile counters based on metric
     const updates: any = {};
     if (metric === 'email_sent') {
-      updates.emails_sent = (profile.emails_sent || 0) + quantity;
+      updates.emails_sent = ((profile as any).emails_sent || 0) + quantity;
     } else if (metric === 'sms_sent') {
-      updates.sms_sent = (profile.sms_sent || 0) + quantity;
+      updates.sms_sent = ((profile as any).sms_sent || 0) + quantity;
     }
 
     if (Object.keys(updates).length > 0) {
