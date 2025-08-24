@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
       .gte('accessed_at', startDate.toISOString())
       .single();
 
-    const usage = {
+    const usage: any = {
       period,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
