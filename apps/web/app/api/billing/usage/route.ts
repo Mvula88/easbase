@@ -102,29 +102,29 @@ export async function GET(request: NextRequest) {
       metrics: {
         mau: {
           used: activeUsers?.count || 0,
-          limit: plan.limits?.mau || 0,
-          percentage: plan.limits?.mau ? ((activeUsers?.count || 0) / plan.limits.mau) * 100 : 0,
+          limit: (plan.limits as any)?.mau || 0,
+          percentage: (plan.limits as any)?.mau ? ((activeUsers?.count || 0) / (plan.limits as any).mau) * 100 : 0,
         },
         emails: {
           used: emailsSent?.count || 0,
-          limit: plan.limits?.emails || 0,
-          percentage: plan.limits?.emails ? ((emailsSent?.count || 0) / plan.limits.emails) * 100 : 0,
+          limit: (plan.limits as any)?.emails || 0,
+          percentage: (plan.limits as any)?.emails ? ((emailsSent?.count || 0) / (plan.limits as any).emails) * 100 : 0,
         },
         sms: {
           used: smsSent?.count || 0,
-          limit: plan.limits?.sms || 0,
-          percentage: plan.limits?.sms ? ((smsSent?.count || 0) / plan.limits.sms) * 100 : 0,
+          limit: (plan.limits as any)?.sms || 0,
+          percentage: (plan.limits as any)?.sms ? ((smsSent?.count || 0) / (plan.limits as any).sms) * 100 : 0,
         },
         storage: {
           used: storageUsedGB,
-          limit: plan.limits?.storage || 0,
-          percentage: plan.limits?.storage ? (storageUsedGB / plan.limits.storage) * 100 : 0,
+          limit: (plan.limits as any)?.storage || 0,
+          percentage: (plan.limits as any)?.storage ? (storageUsedGB / (plan.limits as any).storage) * 100 : 0,
           unit: 'GB',
         },
         bandwidth: {
           used: (bandwidthLogs?.count || 0) * 0.001, // Rough estimate: 1MB per access
-          limit: plan.limits?.bandwidth || 0,
-          percentage: plan.limits?.bandwidth ? ((bandwidthLogs?.count || 0) * 0.001 / plan.limits.bandwidth) * 100 : 0,
+          limit: (plan.limits as any)?.bandwidth || 0,
+          percentage: (plan.limits as any)?.bandwidth ? ((bandwidthLogs?.count || 0) * 0.001 / (plan.limits as any).bandwidth) * 100 : 0,
           unit: 'GB',
         },
         projects: {
