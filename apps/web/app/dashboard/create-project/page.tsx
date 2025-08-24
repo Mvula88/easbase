@@ -138,6 +138,16 @@ export default function CreateProjectWizard() {
   };
 
   const handleCreateProject = async () => {
+    // Validate required fields
+    if (!config.projectName || !config.businessType) {
+      toast({
+        title: "Missing Information",
+        description: "Please provide a project name and select a business type.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     console.log('Creating project with config:', config);
     setIsCreating(true);
     
@@ -149,6 +159,7 @@ export default function CreateProjectWizard() {
       });
       
       const data = await response.json();
+      console.log('API Response:', data);
       
       if (!response.ok) {
         throw new Error(data.error || 'Failed to create project');
@@ -159,10 +170,10 @@ export default function CreateProjectWizard() {
         description: "Your backend has been created successfully.",
       });
       
-      // For now, redirect to dashboard since project page doesn't exist yet
+      // Redirect to projects page
       setTimeout(() => {
-        router.push('/dashboard');
-      }, 1000);
+        router.push('/dashboard/projects');
+      }, 1500);
       
     } catch (error: any) {
       console.error('Error creating project:', error);
@@ -182,7 +193,15 @@ export default function CreateProjectWizard() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Create Your Backend</h1>
           <p className="text-gray-600">Get a complete backend in 60 seconds</p>
-          <Progress value={progress} className="mt-4 h-2" />
+          <div className="mt-4">
+            <Progress value={progress} className="h-2" />
+            <div className="flex justify-between mt-2 text-sm text-gray-600">
+              <span className={step === 1 ? 'font-semibold text-cyan-600' : ''}>1. Choose Type</span>
+              <span className={step === 2 ? 'font-semibold text-cyan-600' : ''}>2. Project Details</span>
+              <span className={step === 3 ? 'font-semibold text-cyan-600' : ''}>3. Features</span>
+              <span className={step === 4 ? 'font-semibold text-cyan-600' : ''}>4. Create</span>
+            </div>
+          </div>
         </div>
 
         {/* Step 1: Choose Business Type */}
