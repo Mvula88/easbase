@@ -162,7 +162,8 @@ export default function CreateProjectWizard() {
       console.log('API Response:', data);
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create project');
+        console.error('API Error Details:', data);
+        throw new Error(data.error || data.details || 'Failed to create project');
       }
       
       toast({
