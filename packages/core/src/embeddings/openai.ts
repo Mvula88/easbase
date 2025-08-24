@@ -1,13 +1,16 @@
-import OpenAI from 'openai';
-
 export class OpenAIEmbeddings {
-  private client: OpenAI | null = null;
+  private client: any = null;
   private model = 'text-embedding-3-small'; // 1536 dimensions, optimized for cost/performance
   
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey) {
-      this.client = new OpenAI({ apiKey });
+      try {
+        const OpenAI = require('openai').default || require('openai');
+        this.client = new OpenAI({ apiKey });
+      } catch (error) {
+        console.warn('OpenAI module not available, using fallback embeddings');
+      }
     }
   }
 
@@ -52,7 +55,7 @@ export class OpenAIEmbeddings {
           input: batch.map(text => text.slice(0, 8000)),
         });
         
-        allEmbeddings.push(...response.data.map(d => d.embedding));
+        allEmbeddings.push(...response.data.map((d: any) => d.embedding));
       }
 
       return allEmbeddings;
