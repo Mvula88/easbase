@@ -1,12 +1,12 @@
 # Database Setup Guide
 
 ## Prerequisites
-- Supabase project created (✅ You have: rgpitrwgattviyazsahf)
+- Supabase project created
 - Database password (get from Supabase Dashboard)
 
 ## Step 1: Get Your Database Password
 
-1. Go to your [Supabase Dashboard](https://supabase.com/dashboard/project/rgpitrwgattviyazsahf/settings/database)
+1. Go to your [Supabase Dashboard](https://supabase.com/dashboard/project/YOUR_PROJECT_REF/settings/database)
 2. Navigate to Settings > Database
 3. Find your database password or reset it if needed
 
@@ -14,7 +14,7 @@
 
 ```bash
 cd apps/web
-npx supabase link --project-ref rgpitrwgattviyazsahf
+npx supabase link --project-ref YOUR_PROJECT_REF
 # Enter your database password when prompted
 ```
 
@@ -30,7 +30,7 @@ npx supabase db diff
 
 ## Step 4: Verify Deployment
 
-1. Go to [Table Editor](https://supabase.com/dashboard/project/rgpitrwgattviyazsahf/editor)
+1. Go to [Table Editor](https://supabase.com/dashboard/project/YOUR_PROJECT_REF/editor)
 2. You should see these tables:
    - `profiles` - User profiles
    - `subscriptions` - Stripe subscriptions
@@ -44,7 +44,7 @@ npx supabase db diff
 
 If the CLI doesn't work, you can manually run the SQL:
 
-1. Go to [SQL Editor](https://supabase.com/dashboard/project/rgpitrwgattviyazsahf/sql/new)
+1. Go to [SQL Editor](https://supabase.com/dashboard/project/YOUR_PROJECT_REF/sql/new)
 2. Copy the contents of `supabase/migrations/001_production_schema.sql`
 3. Paste and run in the SQL editor
 

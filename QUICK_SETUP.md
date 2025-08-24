@@ -6,11 +6,11 @@ Run this command and enter your database password when prompted:
 
 ```bash
 cd apps/web
-npx supabase link --project-ref rgpitrwgattviyazsahf
+npx supabase link --project-ref YOUR_PROJECT_REF
 ```
 
 **Need your database password?**
-1. Go to: https://supabase.com/dashboard/project/rgpitrwgattviyazsahf/settings/database
+1. Go to: https://supabase.com/dashboard/project/YOUR_PROJECT_REF/settings/database
 2. Find or reset your database password
 
 ## 2. Push the Database Schema
@@ -26,7 +26,7 @@ npx supabase db push
 If the CLI gives you trouble, just copy and paste the SQL directly:
 
 1. **Open SQL Editor:**
-   https://supabase.com/dashboard/project/rgpitrwgattviyazsahf/sql/new
+   https://supabase.com/dashboard/project/YOUR_PROJECT_REF/sql/new
 
 2. **Copy the migration SQL:**
    - Open `supabase/migrations/001_production_schema.sql`
@@ -49,7 +49,7 @@ Visit: http://localhost:3000
 ## 5. Test Your Setup
 
 1. **Check Tables Created:**
-   https://supabase.com/dashboard/project/rgpitrwgattviyazsahf/editor
+   https://supabase.com/dashboard/project/YOUR_PROJECT_REF/editor
 
    You should see:
    - profiles

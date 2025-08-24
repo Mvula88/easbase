@@ -1,11 +1,19 @@
 // Test Supabase Management API connection
 require('dotenv').config({ path: '../apps/web/.env.local' });
 
-const SUPABASE_ACCESS_TOKEN = process.env.SUPABASE_ACCESS_TOKEN || 'sbp_7b84d1c803861c35c885a275f4f775660fc1e90b';
-const SUPABASE_ORGANIZATION_ID = process.env.SUPABASE_ORGANIZATION_ID || 'vizlxayylfgwvkyjqgmx';
+const SUPABASE_ACCESS_TOKEN = process.env.SUPABASE_ACCESS_TOKEN;
+const SUPABASE_ORGANIZATION_ID = process.env.SUPABASE_ORGANIZATION_ID;
 const SUPABASE_MANAGEMENT_API_URL = process.env.SUPABASE_MANAGEMENT_API_URL || 'https://api.supabase.com';
 
 async function testConnection() {
+  if (!SUPABASE_ACCESS_TOKEN || !SUPABASE_ORGANIZATION_ID) {
+    console.error('❌ Missing required environment variables:');
+    if (!SUPABASE_ACCESS_TOKEN) console.error('  - SUPABASE_ACCESS_TOKEN');
+    if (!SUPABASE_ORGANIZATION_ID) console.error('  - SUPABASE_ORGANIZATION_ID');
+    console.log('\n📝 Add these to your .env.local file');
+    return;
+  }
+
   console.log('🔍 Testing Supabase Management API Connection...\n');
   console.log('Configuration:');
   console.log('- Organization ID:', SUPABASE_ORGANIZATION_ID);
