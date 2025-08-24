@@ -203,6 +203,52 @@ export default function CreateProjectWizard() {
               <span className={step === 4 ? 'font-semibold text-cyan-600' : ''}>4. Create</span>
             </div>
           </div>
+          
+          {/* Debug Test Button */}
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+            <p className="text-sm text-yellow-800 mb-2">Debug Mode - Test API Connection</p>
+            <Button 
+              onClick={async () => {
+                console.log('Testing API connection...');
+                try {
+                  const response = await fetch('/api/projects/test-create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                      projectName: 'Debug Test',
+                      businessType: 'test',
+                      features: {}
+                    })
+                  });
+                  const data = await response.json();
+                  console.log('Test API Response:', data);
+                  if (response.ok) {
+                    toast({
+                      title: "API Test Success",
+                      description: "Check console for details",
+                    });
+                  } else {
+                    toast({
+                      title: "API Test Failed",
+                      description: data.error + (data.details ? ': ' + data.details : ''),
+                      variant: "destructive"
+                    });
+                  }
+                } catch (error: any) {
+                  console.error('Test API Error:', error);
+                  toast({
+                    title: "Connection Error",
+                    description: error.message,
+                    variant: "destructive"
+                  });
+                }
+              }}
+              variant="outline"
+              className="bg-yellow-100 hover:bg-yellow-200"
+            >
+              Test API Connection
+            </Button>
+          </div>
         </div>
 
         {/* Step 1: Choose Business Type */}
