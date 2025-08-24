@@ -1,17 +1,20 @@
 import Stripe from 'stripe';
 import { getEnv } from '@/lib/config/env';
 
-let stripe: Stripe | null = null;
+let stripeClient: Stripe | null = null;
 
 export function getStripeClient() {
-  if (!stripe) {
+  if (!stripeClient) {
     const env = getEnv();
-    stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+    stripeClient = new Stripe(env.STRIPE_SECRET_KEY, {
       apiVersion: '2023-10-16',
     });
   }
-  return stripe;
+  return stripeClient;
 }
+
+// Export stripe instance for backward compatibility
+export const stripe = getStripeClient();
 
 export const PLANS = {
   free: {
