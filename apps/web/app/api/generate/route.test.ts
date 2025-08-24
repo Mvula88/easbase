@@ -31,8 +31,8 @@ describe('POST /api/generate', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const module = await import('./route');
-    POST = module.POST;
+    const routeModule = await import('./route');
+    POST = routeModule.POST;
   });
 
   it('should require authentication', async () => {
