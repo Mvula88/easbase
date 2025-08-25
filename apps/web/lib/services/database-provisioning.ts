@@ -63,7 +63,7 @@ export class DatabaseProvisioningService {
   /**
    * Create a new database project for a customer
    */
-  async createProject(customerId: string, customerEmail: string, plan: 'free' | 'pro' = 'free'): Promise<DatabaseProject> {
+  async createProject(customerId: string, customerEmail: string, plan: 'free' | 'pro' | 'enterprise' = 'free'): Promise<DatabaseProject> {
     try {
       const projectName = `easbase-${customerId.slice(0, 8)}`;
       
@@ -72,7 +72,7 @@ export class DatabaseProvisioningService {
         body: JSON.stringify({
           name: projectName,
           organization_id: this.organizationId,
-          plan,
+          plan: plan === 'enterprise' ? 'pro' : plan, // Use 'pro' for enterprise customers
           region: 'us-east-1',
           db_pass: this.generateSecurePassword(),
           kps_enabled: true, // Enable connection pooling
