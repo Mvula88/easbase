@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       user.email!,
       {
         name: projectName || backendDesign.suggestedName,
-        template: 'custom',
+        template: 'saas', // Default to SaaS template for AI-generated backends
         plan: 'free'
       }
     );

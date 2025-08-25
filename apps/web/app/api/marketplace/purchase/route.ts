@@ -4,7 +4,7 @@ import { createClient } from '@/lib/auth/supabase-server';
 import { MARKETPLACE_TEMPLATES } from '@/lib/marketplace/templates';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2023-10-16',
 });
 
 export async function POST(req: NextRequest) {
@@ -74,13 +74,8 @@ export async function POST(req: NextRequest) {
           templateId: template.id,
           userId: user.id,
         },
-        // Split payment: 70% to author, 30% to platform
-        transfer_data: template.author !== 'Easbase Team' ? {
-          // This would transfer to the author's Stripe account
-          // Requires Stripe Connect setup
-          amount: Math.floor(template.authorRevenue * 100),
-          // destination: authorStripeAccountId,
-        } : undefined,
+        // Note: Transfer to authors requires Stripe Connect setup
+        // For now, we'll handle payouts manually
       },
     });
 
