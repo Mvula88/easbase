@@ -330,9 +330,11 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">${project.revenue}</p>
-                    <Badge variant={project.status === 'active' ? 'success' : 'warning'}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      project.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                    }`}>
                       {project.status}
-                    </Badge>
+                    </span>
                   </div>
                 </div>
               ))}

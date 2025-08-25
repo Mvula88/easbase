@@ -97,7 +97,7 @@ export default function BillingOverview() {
   ];
 
   const getStatusBadge = (status: string) => {
-    const variants = {
+    const variants: Record<string, string> = {
       paid: 'success',
       pending: 'warning',
       failed: 'destructive',
