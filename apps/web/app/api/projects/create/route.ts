@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/auth/supabase-server';
+import { CustomerBackendService } from '@/lib/services/customer-backend';
+import { DatabaseProvisioningService } from '@/lib/services/database-provisioning';
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,10 +19,10 @@ export async function POST(req: NextRequest) {
     
     // Parse request body
     const body = await req.json();
-    const { businessType, projectName, description, features } = body;
+    const { businessType, projectName, description, features, plan = 'free' } = body;
     
     console.log('Creating project for user:', user.id);
-    console.log('Project config:', { businessType, projectName, features });
+    console.log('Project config:', { businessType, projectName, features, plan });
     
     // Validate input
     if (!projectName || !businessType) {
@@ -29,84 +31,91 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    
-    // Check if user already has a project with this name
-    const { data: existingProject, error: checkError } = await supabase
-      .from('customer_projects')
-      .select('id')
-      .eq('customer_id', user.id)
-      .eq('project_name', projectName)
-      .single();
-    
-    // Only check for duplicate if we didn't get a "no rows" error
-    if (existingProject) {
-      return NextResponse.json(
-        { error: 'A project with this name already exists' },
-        { status: 409 }
+
+    // Check if provisioning is enabled
+    const provisioningService = new DatabaseProvisioningService();
+    if (!provisioningService.isProvisioningEnabled()) {
+      console.log('Provisioning not enabled, using shared instance approach');
+      
+      // Fallback to shared instance approach (MVP)
+      return createSharedInstanceProject(user, projectName, businessType, features, description);
+    }
+
+    // Map business types to templates
+    const templateMap: Record<string, 'saas' | 'marketplace' | 'social' | 'enterprise'> = {
+      'saas': 'saas',
+      'marketplace': 'marketplace',
+      'ecommerce': 'marketplace',
+      'social': 'social',
+      'enterprise': 'enterprise',
+      'default': 'saas'
+    };
+
+    const template = templateMap[businessType] || 'saas';
+
+    try {
+      // Use the new CustomerBackendService to create a real Supabase project
+      const backendService = new CustomerBackendService();
+      const backend = await backendService.createBackend(
+        user.id,
+        user.email!,
+        {
+          name: projectName,
+          template,
+          plan: plan as 'free' | 'pro' | 'enterprise'
+        }
       );
-    }
-    
-    if (checkError && checkError.code !== 'PGRST116') {
-      console.error('Error checking existing project:', checkError);
-    }
-    
-    // For MVP, we'll use multi-tenant approach (shared Supabase)
-    // In production, this would create a dedicated Supabase project
-    
-    // Generate unique project credentials
-    const projectId = crypto.randomUUID();
-    const apiKey = `easbase_${user.id.substring(0, 8)}_${Date.now()}_${crypto.randomUUID().substring(0, 8)}`;
-    
-    // Create project record
-    const { data: project, error: createError } = await supabase
-      .from('customer_projects')
-      .insert({
-        customer_id: user.id,
-        project_name: projectName,
-        business_type: businessType,
-        api_key: apiKey,
-        status: 'provisioning',
-        features: features,
-        metadata: { description },
-        // For MVP, we use our own Supabase instance
-        supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        supabase_anon_key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      })
-      .select()
-      .single();
-    
-    if (createError) {
-      console.error('Error creating project:', createError);
-      return NextResponse.json(
-        { error: 'Failed to create project' },
-        { status: 500 }
-      );
-    }
-    
-    // For now, skip the feature configs and templates since those tables might not exist
-    // Just update the project status to active
-    const { error: updateError } = await supabase
-      .from('customer_projects')
-      .update({ 
+
+      // Store in customer_projects table for backward compatibility
+      const { data: project, error: createError } = await supabase
+        .from('customer_projects')
+        .insert({
+          customer_id: user.id,
+          project_name: projectName,
+          business_type: businessType,
+          api_key: backend.credentials.anonKey,
+          status: 'active',
+          features: features,
+          metadata: { 
+            description,
+            backend_id: backend.id,
+            project_id: backend.projectId
+          },
+          supabase_url: backend.endpoints.api,
+          supabase_anon_key: backend.credentials.anonKey
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error storing project record:', createError);
+        // Don't fail if storing fails, backend is already created
+      }
+
+      // Return project details with real Supabase backend
+      return NextResponse.json({
+        id: backend.id,
+        projectName: projectName,
+        apiKey: backend.credentials.anonKey,
+        apiUrl: backend.endpoints.api,
+        authUrl: backend.endpoints.auth,
+        storageUrl: backend.endpoints.storage,
+        realtimeUrl: backend.endpoints.realtime,
         status: 'active',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', project.id);
-    
-    if (updateError) {
-      console.error('Error updating project status:', updateError);
+        features: features,
+        plan: plan,
+        createdAt: backend.createdAt,
+        // Include docs URL
+        docsUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/backends/${backend.id}/docs`
+      });
+
+    } catch (provisioningError: any) {
+      console.error('Failed to provision dedicated backend:', provisioningError);
+      
+      // Fallback to shared instance if provisioning fails
+      console.log('Falling back to shared instance approach');
+      return createSharedInstanceProject(user, projectName, businessType, features, description);
     }
-    
-    // Return project details
-    return NextResponse.json({
-      id: project.id,
-      projectName: project.project_name,
-      apiKey: project.api_key,
-      apiUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/v1/${user.id}`,
-      status: 'active',
-      features: features,
-      createdAt: project.created_at
-    });
     
   } catch (error: any) {
     console.error('Project creation error:', error);
@@ -125,79 +134,71 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function getDefaultFeatureConfig(featureType: string): any {
-  const configs: Record<string, any> = {
-    auth: {
-      providers: ['email', 'google'],
-      requireEmailVerification: true,
-      sessionDuration: 30 * 24 * 60 * 60 // 30 days
-    },
-    database: {
-      enableRealtime: true,
-      enableRLS: true,
-      backupFrequency: 'daily'
-    },
-    storage: {
-      maxFileSize: 50 * 1024 * 1024, // 50MB
-      allowedMimeTypes: ['image/*', 'application/pdf'],
-      buckets: ['avatars', 'documents', 'public']
-    },
-    email: {
-      provider: 'resend',
-      fromEmail: 'noreply@easbase.com',
-      templates: ['welcome', 'reset-password', 'confirmation']
-    },
-    payments: {
-      provider: 'stripe',
-      currency: 'usd',
-      taxCalculation: 'automatic'
-    },
-    analytics: {
-      trackPageViews: true,
-      trackApiCalls: true,
-      retentionDays: 90
-    }
-  };
-  
-  return configs[featureType] || {};
-}
-
-async function applyBusinessTemplate(projectId: string, businessType: string, userId: string) {
+// Fallback function for shared instance approach (MVP)
+async function createSharedInstanceProject(
+  user: any,
+  projectName: string,
+  businessType: string,
+  features: any,
+  description: string
+) {
   const supabase = await createClient();
   
-  // Get template for business type
-  const { data: template } = await supabase
-    .from('project_templates')
-    .select('*')
-    .eq('business_type', businessType)
+  // Check if user already has a project with this name
+  const { data: existingProject } = await supabase
+    .from('customer_projects')
+    .select('id')
+    .eq('customer_id', user.id)
+    .eq('project_name', projectName)
     .single();
   
-  if (!template) {
-    console.log('No template found for business type:', businessType);
-    return;
+  if (existingProject) {
+    return NextResponse.json(
+      { error: 'A project with this name already exists' },
+      { status: 409 }
+    );
   }
   
-  // Store schema definition
-  await supabase
-    .from('project_schemas')
-    .insert({
-      project_id: projectId,
-      schema_definition: template.schema_template,
-      ai_generated: false,
-      applied_at: new Date().toISOString()
-    });
+  // Generate unique project credentials for shared instance
+  const projectId = crypto.randomUUID();
+  const apiKey = `easbase_${user.id.substring(0, 8)}_${Date.now()}_${crypto.randomUUID().substring(0, 8)}`;
   
-  // In production, this would execute SQL to create tables
-  // For MVP, we'll use a shared schema with tenant isolation
-  
-  // Track deployment
-  await supabase
-    .from('project_deployments')
+  // Create project record
+  const { data: project, error: createError } = await supabase
+    .from('customer_projects')
     .insert({
-      project_id: projectId,
-      deployment_type: 'schema',
-      deployment_data: template.schema_template,
-      status: 'success',
-      deployed_by: userId
-    });
+      customer_id: user.id,
+      project_name: projectName,
+      business_type: businessType,
+      api_key: apiKey,
+      status: 'active',
+      features: features,
+      metadata: { description, shared_instance: true },
+      // For MVP, we use our own Supabase instance
+      supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabase_anon_key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    })
+    .select()
+    .single();
+  
+  if (createError) {
+    console.error('Error creating project:', createError);
+    return NextResponse.json(
+      { error: 'Failed to create project' },
+      { status: 500 }
+    );
+  }
+  
+  // Return project details for shared instance
+  return NextResponse.json({
+    id: project.id,
+    projectName: project.project_name,
+    apiKey: project.api_key,
+    apiUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/v1/${user.id}`,
+    status: 'active',
+    features: features,
+    createdAt: project.created_at,
+    sharedInstance: true, // Indicate this is using shared instance
+    upgradeAvailable: true // Show upgrade option
+  });
 }

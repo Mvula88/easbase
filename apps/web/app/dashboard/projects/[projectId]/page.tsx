@@ -428,25 +428,27 @@ const { data, error } = await client
                 </div>
               </div>
 
-              {project.supabase_url && (
-                <div>
-                  <Label>Supabase URL</Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Input
-                      value={project.supabase_url}
-                      readOnly
-                      className="font-mono text-sm"
-                    />
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => window.open(project.supabase_url, '_blank')}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                  </div>
+              {/* Backend Endpoints - Show Easbase branded URLs */}
+              <div>
+                <Label>API Endpoint</Label>
+                <div className="flex items-center gap-2 mt-2">
+                  <Input
+                    value={apiEndpoint}
+                    readOnly
+                    className="font-mono text-sm"
+                  />
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => navigator.clipboard.writeText(apiEndpoint)}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
                 </div>
-              )}
+                <p className="text-xs text-gray-500 mt-1">
+                  Use this endpoint for all API calls
+                </p>
+              </div>
             </CardContent>
           </Card>
 
