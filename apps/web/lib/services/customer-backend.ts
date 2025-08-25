@@ -173,10 +173,8 @@ export class CustomerBackendService {
 
     if (error) throw error;
 
-    // Set up custom domain for upgraded plans
-    if (newPlan !== 'free') {
-      await this.setupCustomDomain(this.mapToCustomerBackend(data));
-    }
+    // Set up custom domain for upgraded plans (pro and enterprise always get custom domains)
+    await this.setupCustomDomain(this.mapToCustomerBackend(data));
 
     return this.mapToCustomerBackend(data);
   }
