@@ -115,28 +115,15 @@ export async function POST(req: NextRequest) {
 }
 
 async function sendPurchaseConfirmation(email: string, templateName: string) {
-  // Send email using your email service
+  const { sendEmail, emailTemplates } = await import('@/lib/email/resend');
+  
   try {
-    await fetch('/api/emails/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: email,
-        subject: `🎉 Template Purchase Confirmed: ${templateName}`,
-        html: `
-          <h2>Thank you for your purchase!</h2>
-          <p>Your backend template "${templateName}" is now ready to deploy.</p>
-          <p>You can access it from your dashboard and deploy it with one click.</p>
-          <br>
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/templates" 
-             style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
-            Deploy Your Template
-          </a>
-          <br><br>
-          <p>Need help? Reply to this email or visit our documentation.</p>
-          <p>Best regards,<br>The Easbase Team</p>
-        `,
-      }),
+    const downloadUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/templates`;
+    const template = emailTemplates.purchaseConfirmation(templateName, downloadUrl);
+    
+    await sendEmail({
+      to: email,
+      ...template
     });
   } catch (error) {
     console.error('Failed to send confirmation email:', error);

@@ -187,6 +187,275 @@ export const MARKETPLACE_TEMPLATES: BackendTemplate[] = [
     documentation: '# Social Network API Documentation...',
     imageUrl: '/templates/social-network.png',
     tags: ['social', 'media', 'messaging', 'content']
+  },
+  {
+    id: 'healthcare-platform',
+    name: 'Healthcare Platform Backend',
+    description: 'Complete telemedicine platform with appointments, prescriptions, patient records, video consultations',
+    category: 'Healthcare',
+    price: 499,
+    authorRevenue: 349,
+    author: 'Dr. Tech Solutions',
+    rating: 4.9,
+    downloads: 89,
+    features: [
+      'Patient management system',
+      'Appointment scheduling with calendar',
+      'Video consultation integration',
+      'Electronic health records (EHR)',
+      'Prescription management',
+      'Lab results tracking',
+      'Insurance verification',
+      'HIPAA compliance ready',
+      'Multi-clinic support',
+      'Real-time notifications',
+    ],
+    imageUrl: '/templates/healthcare.png',
+    tags: ['healthcare', 'telemedicine', 'appointments', 'medical', 'HIPAA'],
+    demoUrl: 'https://demo.easbase.io/healthcare',
+    schema: `
+      -- Patients, Doctors, Appointments
+      CREATE TABLE patients (
+        id UUID PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE,
+        phone TEXT,
+        date_of_birth DATE,
+        medical_history JSONB,
+        insurance_info JSONB
+      );
+      
+      CREATE TABLE doctors (
+        id UUID PRIMARY KEY,
+        name TEXT NOT NULL,
+        specialization TEXT,
+        license_number TEXT UNIQUE,
+        availability JSONB,
+        consultation_fee DECIMAL
+      );
+      
+      CREATE TABLE appointments (
+        id UUID PRIMARY KEY,
+        patient_id UUID REFERENCES patients(id),
+        doctor_id UUID REFERENCES doctors(id),
+        appointment_date TIMESTAMPTZ,
+        status TEXT,
+        consultation_notes TEXT,
+        prescription JSONB
+      );
+    `,
+    documentation: 'Full healthcare backend with HIPAA-ready architecture, supporting telemedicine, EHR, and multi-clinic operations.',
+  },
+  {
+    id: 'fintech-banking',
+    name: 'Digital Banking Backend',
+    description: 'Modern banking backend with accounts, transactions, KYC, loans, and investment tracking',
+    category: 'Fintech',
+    price: 599,
+    authorRevenue: 419,
+    author: 'FinTech Builders',
+    rating: 4.8,
+    downloads: 134,
+    features: [
+      'Multi-currency accounts',
+      'Transaction processing',
+      'KYC/AML verification',
+      'Loan management system',
+      'Investment portfolios',
+      'Card management',
+      'Fraud detection rules',
+      'Regulatory compliance',
+      'Webhook notifications',
+      'Analytics dashboard',
+    ],
+    imageUrl: '/templates/banking.png',
+    tags: ['fintech', 'banking', 'payments', 'KYC', 'transactions'],
+    demoUrl: 'https://demo.easbase.io/banking',
+    schema: `
+      -- Accounts, Transactions, Cards
+      CREATE TABLE accounts (
+        id UUID PRIMARY KEY,
+        user_id UUID NOT NULL,
+        account_number TEXT UNIQUE,
+        account_type TEXT,
+        balance DECIMAL(15,2),
+        currency TEXT,
+        status TEXT
+      );
+      
+      CREATE TABLE transactions (
+        id UUID PRIMARY KEY,
+        from_account UUID REFERENCES accounts(id),
+        to_account UUID REFERENCES accounts(id),
+        amount DECIMAL(15,2),
+        type TEXT,
+        status TEXT,
+        created_at TIMESTAMPTZ
+      );
+    `,
+    documentation: 'Enterprise-grade banking backend with full compliance features, multi-currency support, and fraud detection.',
+  },
+  {
+    id: 'learning-management',
+    name: 'LMS (Learning Platform) Backend',
+    description: 'Complete e-learning platform with courses, quizzes, certificates, and progress tracking',
+    category: 'Education',
+    price: 349,
+    authorRevenue: 244,
+    author: 'EduTech Pro',
+    rating: 4.7,
+    downloads: 267,
+    features: [
+      'Course management',
+      'Video streaming support',
+      'Quiz & assignment system',
+      'Progress tracking',
+      'Certificate generation',
+      'Discussion forums',
+      'Live class scheduling',
+      'Payment integration',
+      'Multi-language support',
+      'Analytics & reporting',
+    ],
+    imageUrl: '/templates/lms.png',
+    tags: ['education', 'LMS', 'courses', 'e-learning', 'training'],
+    demoUrl: 'https://demo.easbase.io/lms',
+    schema: `
+      -- Courses, Lessons, Enrollments
+      CREATE TABLE courses (
+        id UUID PRIMARY KEY,
+        title TEXT NOT NULL,
+        description TEXT,
+        instructor_id UUID,
+        price DECIMAL(10,2),
+        duration_hours INTEGER,
+        difficulty_level TEXT
+      );
+      
+      CREATE TABLE lessons (
+        id UUID PRIMARY KEY,
+        course_id UUID REFERENCES courses(id),
+        title TEXT NOT NULL,
+        content_type TEXT,
+        content_url TEXT,
+        duration_minutes INTEGER,
+        order_index INTEGER
+      );
+      
+      CREATE TABLE enrollments (
+        id UUID PRIMARY KEY,
+        student_id UUID,
+        course_id UUID REFERENCES courses(id),
+        progress_percentage INTEGER,
+        completed_at TIMESTAMPTZ
+      );
+    `,
+    documentation: 'Full-featured LMS backend supporting video courses, live classes, assessments, and certification.',
+  },
+  {
+    id: 'logistics-delivery',
+    name: 'Logistics & Delivery Backend',
+    description: 'Advanced logistics platform with route optimization, fleet management, and real-time tracking',
+    category: 'Logistics',
+    price: 449,
+    authorRevenue: 314,
+    author: 'LogiTech Solutions',
+    rating: 4.8,
+    downloads: 156,
+    features: [
+      'Fleet management',
+      'Route optimization',
+      'Real-time GPS tracking',
+      'Driver management',
+      'Warehouse inventory',
+      'Delivery scheduling',
+      'Proof of delivery',
+      'Customer notifications',
+      'Analytics dashboard',
+      'Multi-vendor support',
+    ],
+    imageUrl: '/templates/logistics.png',
+    tags: ['logistics', 'delivery', 'fleet', 'tracking', 'shipping'],
+    demoUrl: 'https://demo.easbase.io/logistics',
+    schema: `
+      -- Vehicles, Drivers, Deliveries
+      CREATE TABLE vehicles (
+        id UUID PRIMARY KEY,
+        registration_number TEXT UNIQUE,
+        type TEXT,
+        capacity_kg DECIMAL,
+        current_location POINT,
+        status TEXT
+      );
+      
+      CREATE TABLE deliveries (
+        id UUID PRIMARY KEY,
+        tracking_number TEXT UNIQUE,
+        sender_address TEXT,
+        recipient_address TEXT,
+        vehicle_id UUID REFERENCES vehicles(id),
+        status TEXT,
+        estimated_delivery TIMESTAMPTZ
+      );
+    `,
+    documentation: 'Enterprise logistics backend with route optimization, real-time tracking, and multi-warehouse support.',
+  },
+  {
+    id: 'gaming-platform',
+    name: 'Gaming Platform Backend',
+    description: 'Multiplayer gaming backend with matchmaking, leaderboards, tournaments, and in-game economy',
+    category: 'Gaming',
+    price: 399,
+    authorRevenue: 279,
+    author: 'GameDev Studios',
+    rating: 4.9,
+    downloads: 412,
+    features: [
+      'Player authentication',
+      'Matchmaking system',
+      'Real-time multiplayer',
+      'Leaderboards & rankings',
+      'Tournament management',
+      'In-game economy',
+      'Virtual items & inventory',
+      'Chat & messaging',
+      'Anti-cheat system',
+      'Analytics & metrics',
+    ],
+    imageUrl: '/templates/gaming.png',
+    tags: ['gaming', 'multiplayer', 'tournaments', 'leaderboards', 'matchmaking'],
+    demoUrl: 'https://demo.easbase.io/gaming',
+    schema: `
+      -- Players, Matches, Tournaments
+      CREATE TABLE players (
+        id UUID PRIMARY KEY,
+        username TEXT UNIQUE,
+        email TEXT UNIQUE,
+        level INTEGER,
+        experience_points INTEGER,
+        coins INTEGER,
+        inventory JSONB
+      );
+      
+      CREATE TABLE matches (
+        id UUID PRIMARY KEY,
+        game_mode TEXT,
+        players JSONB,
+        winner_id UUID,
+        duration_seconds INTEGER,
+        created_at TIMESTAMPTZ
+      );
+      
+      CREATE TABLE tournaments (
+        id UUID PRIMARY KEY,
+        name TEXT,
+        prize_pool DECIMAL,
+        participants JSONB,
+        status TEXT,
+        start_date TIMESTAMPTZ
+      );
+    `,
+    documentation: 'Scalable gaming backend with real-time multiplayer, tournaments, and complete player progression system.',
   }
 ];
 
