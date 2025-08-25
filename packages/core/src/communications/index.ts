@@ -311,7 +311,9 @@ export class CommunicationsService {
   // Transactional Emails
   async sendWelcomeEmail(userId: string, email: string, name?: string) {
     return this.sendEmail({
+      from: process.env.EMAIL_FROM || 'noreply@easbase.dev',
       to: email,
+      subject: 'Welcome to Easbase!',
       template: 'welcome',
       variables: {
         name: name || 'there',
@@ -323,7 +325,9 @@ export class CommunicationsService {
 
   async sendPasswordResetEmail(email: string, resetToken: string) {
     return this.sendEmail({
+      from: process.env.EMAIL_FROM || 'noreply@easbase.dev',
       to: email,
+      subject: 'Reset your password',
       template: 'password-reset',
       variables: {
         reset_url: `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${resetToken}`,
@@ -334,7 +338,9 @@ export class CommunicationsService {
 
   async sendInvoiceEmail(email: string, invoiceData: any) {
     return this.sendEmail({
+      from: process.env.EMAIL_FROM || 'noreply@easbase.dev',
       to: email,
+      subject: `Invoice ${invoiceData.number}`,
       template: 'invoice',
       variables: {
         invoice_number: invoiceData.number,
@@ -347,7 +353,9 @@ export class CommunicationsService {
 
   async sendTeamInviteEmail(email: string, inviteData: any) {
     return this.sendEmail({
+      from: process.env.EMAIL_FROM || 'noreply@easbase.dev',
       to: email,
+      subject: `You've been invited to join ${inviteData.team_name}`,
       template: 'team-invite',
       variables: {
         team_name: inviteData.team_name,

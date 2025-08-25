@@ -136,7 +136,10 @@ export class BillingService {
 
     return {
       subscription,
-      clientSecret: (subscription.latest_invoice as Stripe.Invoice)?.payment_intent?.client_secret
+      clientSecret: (subscription.latest_invoice as Stripe.Invoice)?.payment_intent && 
+                   typeof (subscription.latest_invoice as Stripe.Invoice).payment_intent !== 'string' ?
+                   ((subscription.latest_invoice as Stripe.Invoice).payment_intent as Stripe.PaymentIntent).client_secret :
+                   undefined
     };
   }
 
@@ -203,13 +206,12 @@ export class BillingService {
 
     if (!data) throw new Error('No active subscription found');
 
-    const canceledSubscription = await this.stripe.subscriptions.update(
-      data.stripe_subscription_id,
-      {
-        cancel_at_period_end: !immediately,
-        ...(immediately && { cancel_at: 'now' })
-      }
-    );
+    const canceledSubscription = immediately ?
+      await this.stripe.subscriptions.cancel(data.stripe_subscription_id) :
+      await this.stripe.subscriptions.update(
+        data.stripe_subscription_id,
+        { cancel_at_period_end: true }
+      );
 
     // Update database
     await this.supabase

@@ -2,7 +2,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import ora from 'ora';
+import ora, { Ora } from 'ora';
 import inquirer from 'inquirer';
 import fs from 'fs/promises';
 import path from 'path';
@@ -16,11 +16,13 @@ interface DeployConfig {
   supabaseServiceKey?: string;
   environment: 'development' | 'staging' | 'production';
   features: string[];
+  apiKey?: string;
+  projectId?: string;
 }
 
 class EasbaseDeployment {
-  private config: DeployConfig;
-  private spinner: ora.Ora;
+  private config!: DeployConfig;
+  private spinner: Ora;
 
   constructor() {
     this.spinner = ora();
@@ -60,7 +62,7 @@ class EasbaseDeployment {
         name: 'projectName',
         message: 'Project name:',
         default: 'my-easbase-app',
-        validate: (input) => {
+        validate: (input: string) => {
           if (/^[a-z0-9-]+$/.test(input)) return true;
           return 'Project name must contain only lowercase letters, numbers, and hyphens';
         }
@@ -103,7 +105,7 @@ class EasbaseDeployment {
           type: 'input',
           name: 'supabaseUrl',
           message: 'Supabase URL:',
-          validate: (input) => input.startsWith('https://') || 'Must be a valid URL'
+          validate: (input: string) => input.startsWith('https://') || 'Must be a valid URL'
         },
         {
           type: 'password',
@@ -456,8 +458,8 @@ app.get('/api/billing/subscription', async (req, res) => {
     const projectId = `proj_${this.config.projectName}_${Date.now()}`;
     
     // Save to config
-    this.config['apiKey'] = apiKey;
-    this.config['projectId'] = projectId;
+    this.config.apiKey = apiKey;
+    this.config.projectId = projectId;
     
     await this.saveConfig();
     
@@ -524,9 +526,9 @@ app.get('/api/billing/subscription', async (req, res) => {
     console.log(chalk.white('Environment:'), this.config.environment);
     console.log(chalk.white('Features:'), this.config.features.join(', '));
     
-    if (this.config['apiKey']) {
-      console.log(chalk.white('\nAPI Key:'), chalk.yellow(this.config['apiKey']));
-      console.log(chalk.white('Project ID:'), chalk.yellow(this.config['projectId']));
+    if (this.config.apiKey) {
+      console.log(chalk.white('\nAPI Key:'), chalk.yellow(this.config.apiKey));
+      console.log(chalk.white('Project ID:'), chalk.yellow(this.config.projectId || ''));
     }
     
     console.log(chalk.cyan('\n🎯 Next Steps:\n'));

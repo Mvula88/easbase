@@ -51,13 +51,23 @@
     "@anthropic-ai/sdk": "^0.24.3",
     "@supabase/supabase-js": "^2.39.3",
     "crypto": "^1.0.1",
+    "handlebars": "^4.7.8",
+    "inquirer": "^12.9.4",
+    "nodemailer": "^7.0.5",
+    "ora": "^8.2.0",
+    "sharp": "^0.34.3",
+    "twilio": "^5.8.0",
     "zod": "^3.22.4"
   },
   "optionalDependencies": {
     "openai": "^5.13.1"
   },
   "devDependencies": {
+    "@types/inquirer": "^9.0.9",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/mime-types": "^3.0.1",
     "@types/node": "^20.11.10",
+    "@types/nodemailer": "^7.0.1",
     "@vitest/ui": "^3.2.4",
     "typescript": "^5.3.3",
     "vitest": "^3.2.4"
