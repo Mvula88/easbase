@@ -594,7 +594,7 @@ export default function SystemSettings() {
                         <p className="text-xs text-gray-500">Created on Jan 1, 2024</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="success">Active</Badge>
+                        <Badge className="bg-green-100 text-green-700">Active</Badge>
                         <Button variant="ghost" size="sm">Revoke</Button>
                       </div>
                     </div>
@@ -604,7 +604,7 @@ export default function SystemSettings() {
                         <p className="text-xs text-gray-500">Created on Dec 15, 2023</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="warning">Test</Badge>
+                        <Badge className="bg-yellow-100 text-yellow-700">Test</Badge>
                         <Button variant="ghost" size="sm">Revoke</Button>
                       </div>
                     </div>

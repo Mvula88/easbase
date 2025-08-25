@@ -97,13 +97,13 @@ export default function BillingOverview() {
   ];
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, string> = {
-      paid: 'success',
-      pending: 'warning',
-      failed: 'destructive',
-      refunded: 'secondary'
+    const colors: Record<string, string> = {
+      paid: 'bg-green-100 text-green-700',
+      pending: 'bg-yellow-100 text-yellow-700',
+      failed: 'bg-red-100 text-red-700',
+      refunded: 'bg-gray-100 text-gray-700'
     };
-    return <Badge variant={variants[status] as any}>{status}</Badge>;
+    return <Badge className={colors[status] || 'bg-gray-100 text-gray-700'}>{status}</Badge>;
   };
 
   return (

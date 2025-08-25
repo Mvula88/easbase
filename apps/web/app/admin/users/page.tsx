@@ -232,17 +232,17 @@ export default function UsersManagement() {
   };
 
   const getStatusBadge = (status: User['status']) => {
-    const variants = {
-      active: 'success',
-      inactive: 'secondary',
-      suspended: 'destructive',
-      pending: 'warning'
+    const colors = {
+      active: 'bg-green-100 text-green-700',
+      inactive: 'bg-gray-100 text-gray-700',
+      suspended: 'bg-red-100 text-red-700',
+      pending: 'bg-yellow-100 text-yellow-700'
     };
-    return <Badge variant={variants[status] as any}>{status}</Badge>;
+    return <Badge className={colors[status]}>{status}</Badge>;
   };
 
   const getRoleBadge = (role: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       admin: 'bg-purple-100 text-purple-700',
       moderator: 'bg-blue-100 text-blue-700',
       user: 'bg-gray-100 text-gray-700'
@@ -490,16 +490,12 @@ export default function UsersManagement() {
                     <TableCell>{getStatusBadge(user.status)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {user.emailVerified ? (
-                          <Mail className="h-4 w-4 text-green-500" title="Email verified" />
-                        ) : (
-                          <Mail className="h-4 w-4 text-gray-300" title="Email not verified" />
-                        )}
-                        {user.twoFactorEnabled ? (
-                          <Shield className="h-4 w-4 text-green-500" title="2FA enabled" />
-                        ) : (
-                          <Shield className="h-4 w-4 text-gray-300" title="2FA disabled" />
-                        )}
+                        <span title={user.emailVerified ? "Email verified" : "Email not verified"}>
+                          <Mail className={user.emailVerified ? "h-4 w-4 text-green-500" : "h-4 w-4 text-gray-300"} />
+                        </span>
+                        <span title={user.twoFactorEnabled ? "2FA enabled" : "2FA disabled"}>
+                          <Shield className={user.twoFactorEnabled ? "h-4 w-4 text-green-500" : "h-4 w-4 text-gray-300"} />
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">
@@ -672,7 +668,7 @@ export default function UsersManagement() {
                 <div>
                   <Label className="text-gray-500">Subscription</Label>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant={showUserDetails.subscription.status === 'active' ? 'success' : 'secondary'}>
+                    <Badge className={showUserDetails.subscription.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}>
                       {showUserDetails.subscription.plan}
                     </Badge>
                     <span className="text-sm text-gray-500">{showUserDetails.subscription.status}</span>
