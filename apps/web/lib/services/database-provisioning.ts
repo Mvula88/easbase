@@ -43,7 +43,10 @@ export class DatabaseProvisioningService {
   }
 
   private async makeRequest(endpoint: string, options: RequestInit = {}) {
-    const response = await fetch(`${this.apiUrl}${endpoint}`, {
+    const url = `${this.apiUrl}${endpoint}`;
+    console.log(`Making request to: ${url}`);
+    
+    const response = await fetch(url, {
       ...options,
       headers: {
         'Authorization': `Bearer ${this.accessToken}`,
@@ -53,8 +56,15 @@ export class DatabaseProvisioningService {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Database API error: ${error}`);
+      let errorMessage = `Database API error: ${response.status} ${response.statusText}`;
+      try {
+        const errorBody = await response.text();
+        errorMessage += ` - ${errorBody}`;
+        console.error('API Error Response:', errorBody);
+      } catch (e) {
+        console.error('Could not parse error response');
+      }
+      throw new Error(errorMessage);
     }
 
     return response.json();
@@ -65,27 +75,41 @@ export class DatabaseProvisioningService {
    */
   async createProject(customerId: string, customerEmail: string, plan: 'free' | 'pro' | 'enterprise' = 'free'): Promise<DatabaseProject> {
     try {
+      console.log('Creating Supabase project for:', { customerId, customerEmail, plan });
+      console.log('Using organization:', this.organizationId);
+      console.log('Access token present:', !!this.accessToken);
+      
       const projectName = `easbase-${customerId.slice(0, 8)}`;
+      
+      const requestBody = {
+        name: projectName,
+        organization_id: this.organizationId,
+        plan: plan === 'enterprise' ? 'pro' : plan, // Use 'pro' for enterprise customers
+        region: 'us-east-1',
+        db_pass: this.generateSecurePassword(),
+        kps_enabled: true, // Enable connection pooling
+      };
+      
+      console.log('Sending project creation request:', requestBody);
       
       const project = await this.makeRequest('/v1/projects', {
         method: 'POST',
-        body: JSON.stringify({
-          name: projectName,
-          organization_id: this.organizationId,
-          plan: plan === 'enterprise' ? 'pro' : plan, // Use 'pro' for enterprise customers
-          region: 'us-east-1',
-          db_pass: this.generateSecurePassword(),
-          kps_enabled: true, // Enable connection pooling
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       // Store project info in our database
       await this.storeProjectInfo(customerId, project);
 
+      console.log('Project created successfully:', project);
       return project;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create database project:', error);
-      throw new Error('Failed to provision database for customer');
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        stack: error.stack
+      });
+      throw new Error(`Failed to provision database: ${error.message}`);
     }
   }
 
