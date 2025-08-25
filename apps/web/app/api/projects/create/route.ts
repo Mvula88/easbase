@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     
     // Parse request body
     const body = await req.json();
+    // Use 'free' for testing (2 project limit), 'pro' for production ($25/month per project)
     const { businessType, projectName, description, features, plan = 'free' } = body;
     
     console.log('Creating project for user:', user.id);
