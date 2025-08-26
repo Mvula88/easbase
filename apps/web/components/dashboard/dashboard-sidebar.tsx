@@ -40,12 +40,14 @@ interface DashboardSidebarProps {
   user: {
     name: string;
     email: string;
+    role?: string;
   };
   sidebarOpen?: boolean;
   setSidebarOpen?: (open: boolean) => void;
+  isAdmin?: boolean;
 }
 
-export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen }: DashboardSidebarProps) {
+export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen, isAdmin = false }: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -55,24 +57,27 @@ export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen }: D
     router.push('/');
   };
 
-  const menuItems = [
+  const allMenuItems = [
     // Core Features
     {
       href: '/dashboard',
       label: 'Overview',
       icon: BarChart3,
-      exact: true
+      exact: true,
+      section: 'core'
     },
     {
       href: '/dashboard/create-project',
       label: 'Create Backend',
       icon: Rocket,
-      highlight: true
+      highlight: true,
+      section: 'core'
     },
     {
       href: '/dashboard/projects',
       label: 'My Backends',
-      icon: Database
+      icon: Database,
+      section: 'core'
     },
     
     // AI & Builder Features
@@ -80,87 +85,104 @@ export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen }: D
       href: '/ai-builder',
       label: 'AI Backend Builder',
       icon: Brain,
-      isNew: true
+      isNew: true,
+      section: 'ai'
     },
     {
       href: '/marketplace',
       label: 'Template Marketplace',
-      icon: Store
+      icon: Store,
+      section: 'ai'
     },
     {
       href: '/api-marketplace',
       label: 'API Marketplace',
       icon: Layers,
-      isNew: true
+      isNew: true,
+      section: 'ai'
     },
     
     // Management & Analytics
     {
       href: '/dashboard/api-usage',
       label: 'API Usage',
-      icon: Activity
+      icon: Activity,
+      section: 'management'
     },
     {
       href: '/dashboard/api-keys',
       label: 'API Keys',
-      icon: Key
+      icon: Key,
+      section: 'management'
     },
     
     // Team & Collaboration
     {
       href: '/admin/users',
       label: 'Team Management',
-      icon: Users
+      icon: Users,
+      section: 'management'
     },
     {
       href: '/onboarding',
       label: 'Onboarding',
-      icon: UserPlus
+      icon: UserPlus,
+      section: 'management'
     },
     
-    // Admin Features
+    // Admin Features (only shown to admins)
     {
       href: '/admin',
       label: 'Admin Panel',
       icon: ShieldCheck,
-      adminOnly: true
+      adminOnly: true,
+      section: 'admin'
     },
     {
       href: '/admin/testing',
       label: 'Testing Tools',
       icon: Zap,
-      adminOnly: true
+      adminOnly: true,
+      section: 'admin'
     },
     
     // Billing & Settings
     {
       href: '/dashboard/billing',
       label: 'Billing',
-      icon: CreditCard
+      icon: CreditCard,
+      section: 'account'
     },
     {
       href: '/dashboard/settings',
       label: 'Settings',
-      icon: Settings
+      icon: Settings,
+      section: 'account'
     },
     
     // Resources
     {
       href: '/docs',
       label: 'Documentation',
-      icon: BookOpen
+      icon: BookOpen,
+      section: 'resources'
     },
     {
       href: '/help',
       label: 'Help Center',
-      icon: HelpCircle
+      icon: HelpCircle,
+      section: 'resources'
     },
     {
       href: '/contact',
       label: 'Contact Support',
-      icon: Mail
+      icon: Mail,
+      section: 'resources'
     }
   ];
+
+  // Filter menu items based on admin status
+  const menuItems = allMenuItems.filter(item => !item.adminOnly || isAdmin);
 
   const isActive = (href: string, exact: boolean = false) => {
     if (exact) {
@@ -206,7 +228,7 @@ export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen }: D
             {/* Core Features */}
             <div className="pb-2">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 pb-2">Core</p>
-              {menuItems.slice(0, 3).map((item) => {
+              {menuItems.filter(item => item.section === 'core').map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href, item.exact);
                 
@@ -236,7 +258,7 @@ export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen }: D
             {/* AI & Builder Features */}
             <div className="pb-2 pt-2 border-t">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 pb-2">AI & Builder</p>
-              {menuItems.slice(3, 6).map((item) => {
+              {menuItems.filter(item => item.section === 'ai').map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href, item.exact);
                 
@@ -264,7 +286,7 @@ export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen }: D
             {/* Management */}
             <div className="pb-2 pt-2 border-t">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 pb-2">Management</p>
-              {menuItems.slice(6, 10).map((item) => {
+              {menuItems.filter(item => item.section === 'management').map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href, item.exact);
                 
@@ -284,10 +306,11 @@ export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen }: D
               })}
             </div>
 
-            {/* Admin */}
-            <div className="pb-2 pt-2 border-t">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 pb-2">Admin</p>
-              {menuItems.slice(10, 12).map((item) => {
+            {/* Admin - Only shown if user is admin */}
+            {isAdmin && menuItems.some(item => item.section === 'admin') && (
+              <div className="pb-2 pt-2 border-t">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 pb-2">Admin</p>
+                {menuItems.filter(item => item.section === 'admin').map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href, item.exact);
                 
@@ -305,12 +328,13 @@ export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen }: D
                   </Link>
                 );
               })}
-            </div>
+              </div>
+            )}
 
             {/* Account & Billing */}
             <div className="pb-2 pt-2 border-t">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 pb-2">Account</p>
-              {menuItems.slice(12, 14).map((item) => {
+              {menuItems.filter(item => item.section === 'account').map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href, item.exact);
                 
@@ -333,7 +357,7 @@ export function DashboardSidebar({ user, sidebarOpen = true, setSidebarOpen }: D
             {/* Resources */}
             <div className="pb-2 pt-2 border-t">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 pb-2">Resources</p>
-              {menuItems.slice(14).map((item) => {
+              {menuItems.filter(item => item.section === 'resources').map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href, item.exact);
                 

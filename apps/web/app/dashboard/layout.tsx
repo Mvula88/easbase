@@ -29,13 +29,18 @@ export default async function DashboardLayout({
     redirect('/onboarding');
   }
 
+  // Check if user is admin (you can adjust this logic based on your role system)
+  const isAdmin = profile.role === 'admin' || user.email?.endsWith('@easbase.com');
+
   return (
     <div className="flex h-screen">
       <DashboardSidebar 
         user={{
           name: profile.display_name || user.email?.split('@')[0] || 'User',
-          email: user.email || ''
+          email: user.email || '',
+          role: profile.role
         }}
+        isAdmin={isAdmin}
       />
       <main className="flex-1 lg:ml-64 overflow-y-auto">
         {children}
